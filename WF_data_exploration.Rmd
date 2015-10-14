@@ -1,0 +1,93 @@
+---
+title: "WF_data_explore"
+author: "Sarah Klain"
+date: "October 14, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Wind Farm Data Cleaning and Exploration
+
+### Data Cleaning
+I deleted the following columns:
+
+ResponseSet
+Name
+ExternalDataReference
+EmailAddress
+Status
+
+I deleted incomplete surveys
+I made ethnic origin one column
+Attention filter: if att1 = 0 and att2 = 5 then I deleted row
+
+```{r}
+install.packages("support.CEs")
+library(support.CEs)
+library(ggplot2)
+library(ggthemes)
+library(wesanderson)
+
+w <- read.csv("~/Documents/R_2015/wf_ce/Coded_WF_10_14_2015.csv")
+str(w)
+summary(w)
+head(w)
+```
+
+Plots of data by demographic variables
+```{r}
+inc <- ggplot(w, aes(x = income))
+inc + geom_histogram(binwidth=1) + 
+  xlab("Income") + ylab("Count")
+
+gen <- ggplot(w, aes(x = gender))
+gen + geom_histogram() + theme_pander() +
+  xlab("Gender") + ylab("Count") + scale_x_discrete(breaks=c(1, 2))
+
+pol <- ggplot(w, aes(x = pol))
+pol + geom_bar() +
+  xlab("Political Party") + ylab("Count")
+
+emp <- ggplot(w, aes(x = employ))
+emp + geom_histogram() +
+  xlab("Employment") + ylab("Count")
+
+age <- ggplot(w, aes(x = age))
+age + geom_histogram(binwidth = 3) +
+  xlab("Age") + ylab("Count")
+
+```
+## Constructed Means
+
+Input data
+```{r}
+cm <- read.csv("~/Documents/R_2015/wf_ce/Constr_means_MT.csv")
+str(cm)
+summary(cm)
+head(cm)
+```
+
+I did exploratory plots of the data
+
+```{r}
+ggplot(cm, aes(x = type_mean, y = con_mean)) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "goldenrod1", alpha = 1/5) +
+  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
+  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
+  geom_boxplot(width=.2, outlier.shape = NA, alpha = 0.1) +
+  xlab("Type of Constructed Mean") + ylab("Mean Level of Agreement")
+```
+And a squiggly violin plot! 
+```{r}
+ggplot(cm, aes(x = type_mean, y = con_mean)) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "goldenrod1", alpha = 1/5) +
+  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
+  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
+  geom_violin(alpha = 0.1) +
+  xlab("Type of Constructed Mean") + ylab("Mean Level of Agreement")
+```
