@@ -25,6 +25,7 @@ library(wesanderson)
 library(viridis)
 suppressMessages(library(dplyr))
 library(knitr)
+library(tidyr)
 library(broom)
 ```
 
@@ -380,9 +381,26 @@ Input data
 
 ```r
 cm <- read.csv("~/Documents/R_2015/wf_ce/Constr_means_MT.csv")
+cval <- read.csv("Coded_val_10_20_2015.csv")
 ```
 
+str(cval)
 I did exploratory plots of the data
+
+
+```r
+# cval %>% 
+  # gather(val_state, ag_dis, abuse_nep:mean_inst)
+
+# cval2 <- tidyr::gather(cval, "val_state", "ag_dis", 3:29)
+```
+str(cval2)
+head(cval2)
+
+ggplot(cval2, aes(x = val_state, y = ag_dis)) +
+geom_boxplot(width=.2, outlier.shape = NA, alpha = 0.1)
+
+  geom_point(width=.2, alpha = 0.1)
 
 
 ```r
@@ -414,7 +432,7 @@ ggplot(cm, aes(x = type_mean, y = con_mean)) +
 ## Warning: Removed 2 rows containing missing values (geom_point).
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-16-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-17-1.png) 
 
 And a squiggly violin plot! 
 
@@ -428,4 +446,4 @@ ggplot(cm, aes(x = type_mean, y = con_mean)) +
   xlab("Type of Constructed Mean") + ylab("Mean Level of Agreement")
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-17-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-18-1.png) 
