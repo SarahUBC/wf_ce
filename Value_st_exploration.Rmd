@@ -144,9 +144,9 @@ c_MT_means <- c_MT <- ctbl %>%
 
 means_hist <- ggplot(c_MT_means, aes(x = ag_dis2, fill = val_state2)) +
   geom_histogram(binwidth =.5) +
-  scale_fill_viridis(discrete=TRUE, "Flavor of Value\nStatement", option = "plasma") +
+  scale_fill_viridis(discrete=TRUE, "Category of\nValue Statement", option = "plasma") +
   xlab("Response\n1=strong disagree, not green; 5=strong agree, green") +
-  ggtitle("Constructed Metrics: Mean responses to statements grouped by theme") + facet_wrap(~val_state2)
+  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") + facet_wrap(~val_state2)
 
 means_hist
 
@@ -157,8 +157,8 @@ ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_his
 mean_val_st_box <- ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2, fill = val_state2)) +
  geom_boxplot(binwidth = 0.5) +
   xlab("Types of Constructed Mean") + ylab("Response\n1= strong env value; 5 = weak env value") +
-  scale_fill_viridis(discrete=TRUE, "Flavor of Value\nStatement", option = "plasma") +
-  ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample")
+  scale_fill_viridis(discrete=TRUE, "Category of Value\nStatement", option = "plasma") +
+  ggtitle("To what extent do you agree\nwith these value statements?")
 
 mean_val_st_box
 

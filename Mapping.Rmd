@@ -1,0 +1,24 @@
+---
+title: "Mapping WF Data"
+author: "Sarah Klain"
+date: "October 23, 2015"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+# install.packages("devtools")
+ 
+library(devtools)
+ 
+install_github("choroplethr", "trulia")
+ 
+library(choroplethr)
+#See more at: http://www.trulia.com/blog/tech/the-choroplethr-package-for-r/#sthash.fe7tKq76.dpuf
+```
+
