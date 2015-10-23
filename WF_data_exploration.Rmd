@@ -111,7 +111,7 @@ Race
 I will compare this to census tract data since my sample is *very* white. 
 
 ```{r}
-race <- ggplot(c, aes(x = ethnic_or))
+race <- ggplot(c, aes(x = ethnic_or, color = "blue4"))
 race + geom_histogram(binwidth = 3) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Race") + ylab("Count")
@@ -136,7 +136,7 @@ ggsave("fig_att_w_US.pdf")
 Have you seen a wind turbine in operation?
 ```{r}
 oper <- ggplot(nc, aes(x = oper))
-oper + geom_histogram(binwidth = 3, fill = "green4") +
+oper + geom_histogram(binwidth = 3, fill = "blue4") +
   xlab("Response") + ylab("Count") +
   ggtitle("Have you seen a wind turbine in operation?")
 

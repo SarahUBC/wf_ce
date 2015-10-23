@@ -121,6 +121,38 @@ ggsave("fig_MT_val_st_box.pdf")
 ## Warning: Removed 414 rows containing non-finite values (stat_boxplot).
 ```
 
+str(c_MT)
+
+View(c_MT$ag_dis_f)
+summary(c_MT$ag_dis_f)
+View(c_MT_vs)
+
+Bar chart, all questions except means
+
+```r
+c_MT_vs <- c_MT %>% 
+  filter(val_state2 != "mean_nep" & val_state2 != "mean_rel" & val_state2 != "mean_inst" & val_state2 != "mean_mor"& val_state2 != "mean_met")
+
+ggplot(c_MT_vs, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE) +
+  xlab("Response\n1=strong disagree, not green; 5=strong agree, green") +
+  ggtitle("To what extent do you agree with these value statements?") + facet_wrap(~val_state2)
+```
+
+![](Value_st_exploration_files/figure-html/unnamed-chunk-6-1.png) 
+
+c_MT_vs <- c_MT %>% 
+  filter(val_state2 == "mean_nep" | val_state2 != "mean_rel" & val_state2 != "mean_inst" & val_state2 != "mean_mor"& val_state2 != "mean_met")
+
+ggplot(c_MT_vs, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE) +
+  xlab("Response\n1=strong disagree, not green; 5=strong agree, green") +
+  ggtitle("To what extent do you agree with these value statements?") + facet_wrap(~val_state2)
+
+
+
 
 ```r
 ggplot(cval2, aes(x = val_state, y = ag_dis2, color = Sub_pop)) +
@@ -137,7 +169,7 @@ ggplot(cval2, aes(x = val_state, y = ag_dis2, color = Sub_pop)) +
 ## Warning: Removed 2602 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-6-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-7-1.png) 
 
 ```r
 ggsave("fig_all_val_st_dot.pdf")
@@ -156,8 +188,27 @@ ggsave("fig_all_val_st_dot.pdf")
 c_MT_means <- c_MT <- ctbl %>% 
   filter(val_state2 == "mean_nep" | val_state2 == "mean_rel" | val_state2 == "mean_inst" | val_state2 == "mean_mor" )
 
-ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
- geom_boxplot(fill = "gold") +
+ggplot(c_MT_means, aes(x = ag_dis2, fill = val_state2)) +
+  geom_histogram(binwidth =.5) +
+  scale_fill_viridis(discrete=TRUE) +
+  xlab("Response\n1=strong disagree, not green; 5=strong agree, green") +
+  ggtitle("Constructed Metrics: Mean responses to statements grouped by theme") + facet_wrap(~val_state2)
+```
+
+![](Value_st_exploration_files/figure-html/unnamed-chunk-8-1.png) 
+
+```r
+ggsave("fig_mean_val_st_bar.pdf")
+```
+
+```
+## Saving 7 x 5 in image
+```
+
+
+```r
+ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2, fill = val_state2)) +
+ geom_boxplot(binwidth = 0.5) +
   xlab("Types of Constructed Mean") + ylab("Response\n1= strong env value; 5 = weak env value") +
   scale_fill_viridis(discrete=TRUE) +
   ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample")
@@ -167,7 +218,7 @@ ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
 ## Warning: Removed 362 rows containing non-finite values (stat_boxplot).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-7-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-9-1.png) 
 
 ```r
 ggsave("fig_MT_mean_val_st_box.pdf")
@@ -188,7 +239,7 @@ ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
   stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
   stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
   geom_boxplot(width=.2, outlier.shape = NA, alpha = 0.1) +
-  xlab("Type of Constructed Mean") + ylab("Response\n1= strong env value; 5 = weak env value") +
+  xlab("Type of Constructed Mean") + ylab("Response\n1= weak env value; 5 = strong env value") +
   ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample")  +
   theme_pander()
 ```
@@ -225,57 +276,23 @@ ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
 ## Warning: Removed 154 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-8-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-10-1.png) 
 
 ```r
-ggsave("fig_MT_mean_val_st_jit_box.pdf")
-```
-
-```
-## Saving 7 x 5 in image
-```
-
-```
-## Warning: Removed 362 rows containing missing values (stat_summary).
-```
-
-```
-## Warning: Removed 362 rows containing missing values (stat_summary).
-```
-
-```
-## Warning: Removed 362 rows containing non-finite values (stat_boxplot).
-```
-
-```
-## Warning: Removed 362 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 11 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 4 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 41 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 154 rows containing missing values (geom_point).
+# ggsave(file = "~/Users/sarahklain/Documents/R_2015/wf_ce/figs/test.pdf")
 ```
 
 And a squiggly violin plot! 
 
 
+
 ```r
-ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
-  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 1/5) +
+ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2), fill = val_state2) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 0.05) +
   stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
   stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
-  geom_violin(alpha = 0.1) +
+  geom_violin(alpha = 0.01) +
+  scale_fill_viridis(discrete=TRUE) +
   xlab("Type of Constructed Mean") + ylab("Mean Level of Agreement") +
   ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample") +
   theme_pander()
@@ -297,7 +314,7 @@ ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
 ## Warning: Removed 362 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-9-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-11-1.png) 
 
 ```r
 ggsave("fig_MT_mean_val_st_jit_vio.pdf")
