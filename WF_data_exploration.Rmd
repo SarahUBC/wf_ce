@@ -35,7 +35,7 @@ library(tidyr)
 library(broom)
 ```
 
-load data, c for coded, nc for not coded
+load data: c for coded, nc for not coded
 
 ```{r}
 c <- read.csv("~/Documents/R_2015/wf_ce/Coded_WF_10_14_2015.csv")

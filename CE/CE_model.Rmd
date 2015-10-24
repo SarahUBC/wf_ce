@@ -1,0 +1,74 @@
+---
+title: "CE_Model"
+author: "Sarah Klain"
+date: "October 23, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE")
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+library(wesanderson)
+library(viridis)
+suppressMessages(library(dplyr))
+library(knitr)
+library(tidyr)
+library(broom)
+#install.packages("support.CEs")
+library(support.CEs)
+# install.packages("xlsx")
+library(xlsx)
+```
+
+load choice experiment responses data
+
+```{r}
+d <- read.csv("~/Documents/R_2015/wf_ce/CE/2015_10_23_WF_CE.csv")
+```
+
+Figure out how the data should be formatted.
+
+```{r}
+des1 <- rotation.design(
+ attribute.names = list(
+  hab_qual = c("big loss", "small loss", "small gain", "big gain"), 
+  own = c("state", "municipal", "private", "cooperative"), 
+  vis = c("mi1", "mi4", "mi8", "mi10"), 
+  bill  = c("1", "5", "10", "20")), 
+ nalternatives = 2,
+ nblocks = 4,
+ row.renames = FALSE, 
+ randomize = TRUE,
+ seed = 987)
+
+des1
+```
+
+The format for the design matrix
+
+```{r}
+desmat1 <-make.design.matrix(
+  choice.experiment.design = des1,
+  optout = TRUE,
+  categorical.attributes = c("hab_qual", "own", "vis"), 
+  continuous.attributes = c("bill"),
+  unlabeled = TRUE)
+
+desmat1
+write.xlsx(desmat1, "desmat1.xlsx")
+```
+str(desmat1)
+
+Match my JMP CE configuration to the desmat1 
+```{r}
+desmat2 <- read.xlsx("desmat2", 1)
+
+```
+
+
