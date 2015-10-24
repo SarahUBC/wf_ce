@@ -29,7 +29,7 @@ library(tidyr)
 library(broom)
 ```
 
-load data, c for coded, nc for not coded
+load data: c for coded, nc for not coded
 
 
 ```r
@@ -46,17 +46,19 @@ Income
 nc$income2 <- factor(nc$income, levels=c("Less than $10,000", "$10,000-$14,999","$15,000-$24,999", "$25,000-$34,999", "$35,000-$49,999", "$50,000-$74,999","$75,000-$99,999", "$100,000-$124,999","$125,000-$149,000",
 "$150,000-$174,999", "$175,000-$199,999", "$250,000 and above"))
 
-ggplot(data=nc, aes(x=income2, fill = gender)) + 
-  geom_bar()+ 
+inc <- ggplot(data=nc, aes(x=income2)) + 
+  geom_bar(fill = "blue4")+ 
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, option = "plasma") +
   xlab("Income") + ylab("Count")
+
+inc
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
-ggsave("fig_income.pdf")
+ggsave(inc, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/income.pdf")
 ```
 
 ```
@@ -69,15 +71,18 @@ Education
 ```r
 nc$education2 <- factor(nc$education, levels=c("Grade school", "Some high school","High school graduate", "Some college credit ", "Associate degree", "Bechelor degree", "Graduate degree or Professional degree ", "Professional degree"))
 ed <- ggplot(data = nc, aes(x= education2, fill = gender))
-ed + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+edu <- ed + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Education") + ylab("Count") +
   scale_fill_viridis(discrete=TRUE)
+
+
+edu
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-4-1.png) 
 
 ```r
-ggsave("fig_edu.pdf")
+ggsave(edu, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/edu.pdf")
 ```
 
 ```
@@ -88,16 +93,18 @@ Employment
 
 
 ```r
-ggplot(data=nc, aes(x=employment, fill = gender)) + geom_bar() + 
+emp <- ggplot(data=nc, aes(x=employment, fill = gender)) + geom_bar() + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_viridis(discrete=TRUE) +
     xlab("Employment") + ylab("Count")
+
+edu
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-5-1.png) 
 
 ```r
-ggsave("fig_employ.pdf")
+ggsave(emp, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/emp.pdf")
 ```
 
 ```
@@ -108,17 +115,19 @@ Political Party Affiliation
 
 
 ```r
-pol <- ggplot(nc, aes(x = pol_party, fill = education2))
-pol + geom_bar() +
+pol <- ggplot(nc, aes(x = pol_party, fill = education2))+
+  geom_bar() +
   scale_fill_viridis(discrete=TRUE, "Education", option = "magma") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Political Party") + ylab("Count") 
+
+pol
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-6-1.png) 
 
 ```r
-ggsave("fig_employ.pdf")
+ggsave(pol, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/pol.pdf")
 ```
 
 ```
@@ -129,16 +138,18 @@ Age
 
 
 ```r
-age <- ggplot(nc, aes(x = age, fill = gender))
-age + geom_histogram(binwidth = 3) +
+age <- ggplot(nc, aes(x = age, fill = gender)) +
+  geom_histogram(binwidth = 3) +
   scale_fill_viridis(discrete=TRUE) +
   xlab("Age") + ylab("Count")
+
+age
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-7-1.png) 
 
 ```r
-ggsave("fig_age.pdf")
+ggsave(age, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/age.pdf")
 ```
 
 ```
@@ -151,16 +162,18 @@ I will compare this to census tract data since my sample is *very* white.
 
 
 ```r
-race <- ggplot(c, aes(x = ethnic_or))
-race + geom_histogram(binwidth = 3) +
+race <- ggplot(c, aes(x = ethnic_or)) +
+  geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Race") + ylab("Count")
+
+race
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-8-1.png) 
 
 ```r
-ggsave("fig_race.pdf")
+ggsave(race, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/race.pdf")
 ```
 
 ```
@@ -173,17 +186,19 @@ What is your attitude toward developing wind power in the US?
 
 ```r
 nc$att_w_US2 <- factor(nc$att_w_US, levels=c("Very positive","Positive", "Neutral", "Negative", "Very Negative"))
-ed <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party))
-ed + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party)) +
+  geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Attitude") + ylab("Count") +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, "Political Affiliation") +
   ggtitle("What is your attitude toward developing\nwind power in the US?")
+
+attUS
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-9-1.png) 
 
 ```r
-ggsave("fig_att_w_US.pdf")
+ggsave(attUS, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/attUS.pdf")
 ```
 
 ```
@@ -193,13 +208,17 @@ ggsave("fig_att_w_US.pdf")
 Have you seen a wind turbine in operation?
 
 ```r
-oper <- ggplot(nc, aes(x = oper))
-oper + geom_histogram(binwidth = 3, fill = "green4") +
+oper <- ggplot(nc, aes(x = oper)) +
+  geom_histogram(binwidth = 3, fill = "blue4") +
   xlab("Response") + ylab("Count") +
   ggtitle("Have you seen a wind turbine in operation?")
+
+ggsave(oper, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/oper.pdf")
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-10-1.png) 
+```
+## Saving 7 x 5 in image
+```
 
 ```r
 ggsave("fig_oper.pdf")
@@ -215,18 +234,20 @@ In your opinion, construction of offshore wind turbines off the coast of your st
 ```r
 nc$const_st2 <- factor(nc$const_st, levels=c("Encouraged", "Tolerated", "Discouraged", "Prohibited", "Not sure"))
 
-constst <- ggplot(nc, aes(x = const_st2, fill = const_st2))
-constst + geom_histogram(binwidth = 3) +
-  scale_fill_viridis(discrete=TRUE) +
+constst <- ggplot(nc, aes(x = const_st2, fill = const_st2)) +
+  geom_histogram(binwidth = 3) +
+  scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Response") + ylab("Count") +
   ggtitle("In your opinion, construction of offshore\nwind turbines off the coast of your state should be:")
+
+constst
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-11-1.png) 
 
 ```r
-ggsave("fig_const_st.pdf")
+ggsave(constst, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/constst.pdf")
 ```
 
 ```
@@ -239,17 +260,19 @@ Would the presence of a visible offshore wind farm make you more or less likely 
 ```r
 nc$wf_rec2 <- factor(nc$wf_rec, levels=c("Much less likely","Less likely", "No difference", "More likely", "Much more likely"))
 
-wfrec <- ggplot(nc, aes(x = wf_rec2))
-wfrec + geom_histogram(binwidth = 3, fill = "blue4") +
+wfrec <- ggplot(nc, aes(x = wf_rec2)) +
+  geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Response") + ylab("Count") +
   ggtitle("Would the presence of a visible offshore wind farm make you\nmore or less likely to go to the coast for recreational purposes, \ne.g., beach-going, boating, fishing, or walking along the coast?")
+  
+wfrec
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-12-1.png) 
 
 ```r
-ggsave("fig_const_st.pdf")
+ggsave(wfrec, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/wfrec.pdf")
 ```
 
 ```
@@ -262,93 +285,23 @@ Imagine that a wind project off your state’s coast was the first of numerous N
 ```r
 nc$first_m2 <- factor(nc$first_of_many, levels=c("Much less likely to support", "Less likely to support", "No effect on my attitude", "More likely to support", "Much more likely to support"))
 
-First_st <- ggplot(nc, aes(x = first_m2))
-First_st + geom_histogram(binwidth = 3) +
+First_st <- ggplot(nc, aes(x = first_m2)) +
+  geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Response") + ylab("Count") +
-  ggtitle("If you knew that the farm near your state’s coast\nwas the first of many offshore wind farms, would you be\nmore or less likely to support the wind farm?")
+  ggtitle("If you knew that the farm near the coast of your state\nwas the first of many offshore wind farms, would you be\nmore or less likely to support the wind farm?")
+  
+First_st
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-13-1.png) 
 
 ```r
-ggsave("fig_wf_rec.pdf")
+ggsave(First_st, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/First_st.pdf")
 ```
 
 ```
 ## Saving 7 x 5 in image
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <e2>
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <80>
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <99>
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <e2>
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <80>
-```
-
-```
-## Warning in grid.Call(L_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## conversion failure on 'If you knew that the farm near your state’s coast'
-## in 'mbcsToSbcs': dot substituted for <99>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <e2>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <80>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <99>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <e2>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <80>
-```
-
-```
-## Warning in grid.Call.graphics(L_text, as.graphicsAnnot(x$label), x$x, x
-## $y, : conversion failure on 'If you knew that the farm near your state’s
-## coast' in 'mbcsToSbcs': dot substituted for <99>
 ```
 
 Do you recreate on the coast? This could be a range of coastal or ocean-based activities such as going to the beach, surfing, fishing, and/or boating. 
@@ -357,21 +310,22 @@ Do you recreate on the coast? This could be a range of coastal or ocean-based ac
 ```r
 nc$freq_rec2 <- factor(nc$freq_rec, levels=c("Frequently, 20+ times/year", "Sometimes, 10-20 times/year", "Every now and then, 5-10 times/year", "Rarely, 1-5 times/year", "Never"))
 
-freqrec <- ggplot(nc, aes(x = freq_rec2))
-freqrec + geom_histogram(binwidth = 3, fill = "blue4") +
+freqrec <- ggplot(nc, aes(x = freq_rec2)) +
+  geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Response") + ylab("Count") +
   ggtitle("Do you recreate on the coast?\nThis could be a range of coastal or ocean-based activities \nsuch as going to the beach, surfing, fishing, and/or boating.")
+
+freqrec
 ```
 
 ![](WF_data_exploration_files/figure-html/unnamed-chunk-14-1.png) 
 
 ```r
-ggsave("fig_freq_rec.pdf")
+ggsave(freqrec, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/freqrec.pdf")
 ```
 
 ```
 ## Saving 7 x 5 in image
 ```
-
 
