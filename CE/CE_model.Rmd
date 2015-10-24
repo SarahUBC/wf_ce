@@ -106,7 +106,30 @@ str(desmat3)
 ```
 
 ```{r}
+cer <- read.csv("2015_10_23_WF_CE.csv")
 
+cer$id <- as.numeric(cer$id)
+cer$Block <- as.numeric(cer$Block)
+cer$Q1 <- as.numeric(cer$Q1)
+cer$Q2 <- as.numeric(cer$Q2)
+cer$Q3 <- as.numeric(cer$Q3)
+cer$Q4 <- as.numeric(cer$Q4)
+cer$Q5 <- as.numeric(cer$Q5)
+cer$Q6 <- as.numeric(cer$Q6)
+cer$Q7 <- as.numeric(cer$Q7)
+cer$Q8 <- as.numeric(cer$Q8)
+
+str(cer)
+```
+
+This function makes a data set used for a conditional logit model analysis with the function clogit in the package survival or for a binary choice model analysis with the function glm in the package stats.
+
+make.dataset(respondent.dataset, design.matrix,
+                 choice.indicators, detail = FALSE)
+
+```{r}
+ds <- (cer, desmat3, choice.indicators =
+    c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"), detail = FALSE)
 ```
 
 
