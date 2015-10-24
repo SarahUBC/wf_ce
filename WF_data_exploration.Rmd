@@ -88,6 +88,17 @@ edu
 ggsave(emp, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/emp.pdf")
 ```
 
+Gender
+```{r}
+gen <- ggplot(data=nc, aes(x=gender, fill = gender)) + geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_viridis(discrete=TRUE) +
+    xlab("Gender") + ylab("Count")
+
+gen
+ggsave(gen, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/gen.pdf")
+```
+
 Political Party Affiliation
 
 ```{r}

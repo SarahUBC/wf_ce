@@ -111,6 +111,27 @@ ggsave(emp, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/emp.
 ## Saving 7 x 5 in image
 ```
 
+Gender
+
+```r
+gen <- ggplot(data=nc, aes(x=gender, fill = gender)) + geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_viridis(discrete=TRUE) +
+    xlab("Gender") + ylab("Count")
+
+gen
+```
+
+![](WF_data_exploration_files/figure-html/unnamed-chunk-6-1.png) 
+
+```r
+ggsave(gen, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/gen.pdf")
+```
+
+```
+## Saving 7 x 5 in image
+```
+
 Political Party Affiliation
 
 
@@ -124,7 +145,7 @@ pol <- ggplot(nc, aes(x = pol_party, fill = education2))+
 pol
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-6-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-7-1.png) 
 
 ```r
 ggsave(pol, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/pol.pdf")
@@ -146,7 +167,7 @@ age <- ggplot(nc, aes(x = age, fill = gender)) +
 age
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-7-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-8-1.png) 
 
 ```r
 ggsave(age, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/age.pdf")
@@ -170,7 +191,7 @@ race <- ggplot(c, aes(x = ethnic_or)) +
 race
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-8-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-9-1.png) 
 
 ```r
 ggsave(race, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/race.pdf")
@@ -195,7 +216,7 @@ attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party)) +
 attUS
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-9-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-10-1.png) 
 
 ```r
 ggsave(attUS, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/attUS.pdf")
@@ -244,7 +265,7 @@ constst <- ggplot(nc, aes(x = const_st2, fill = const_st2)) +
 constst
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-11-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-12-1.png) 
 
 ```r
 ggsave(constst, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/constst.pdf")
@@ -269,7 +290,7 @@ wfrec <- ggplot(nc, aes(x = wf_rec2)) +
 wfrec
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-12-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-13-1.png) 
 
 ```r
 ggsave(wfrec, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/wfrec.pdf")
@@ -294,7 +315,7 @@ First_st <- ggplot(nc, aes(x = first_m2)) +
 First_st
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-13-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-14-1.png) 
 
 ```r
 ggsave(First_st, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/First_st.pdf")
@@ -319,7 +340,7 @@ freqrec <- ggplot(nc, aes(x = freq_rec2)) +
 freqrec
 ```
 
-![](WF_data_exploration_files/figure-html/unnamed-chunk-14-1.png) 
+![](WF_data_exploration_files/figure-html/unnamed-chunk-15-1.png) 
 
 ```r
 ggsave(freqrec, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/freqrec.pdf")

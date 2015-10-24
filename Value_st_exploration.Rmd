@@ -78,8 +78,8 @@ c_MT_vs <- c_MT %>%
 no_means_bar <- ggplot(c_MT_vs, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE) +
-  xlab("Response\n1=strongly disagree, not green; 5=strongly agree, green") +
-  ggtitle("To what extent do you agree with these value statements?") + facet_wrap(~val_state2)
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("To what extent do you agree with these statements?") + facet_wrap(~val_state2)
 
 no_means_bar
 
@@ -94,9 +94,9 @@ c_MT_vs_nep <- c_MT %>%
 
 NEP_bar <- ggplot(c_MT_vs_nep, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("NEP: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("NEP:\nTo what extent do you agree \nwith these statements?") + facet_wrap(~val_state2)
 
 NEP_bar
 
@@ -113,7 +113,8 @@ met_bar <- ggplot(c_MT_vs_met, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE) +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("Metaphors: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
+  facet_wrap(~val_state2)
 
 met_bar
 ggsave(met_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/met_bar.pdf")
@@ -123,13 +124,13 @@ Violin plots just for metaphors
 
 ```{r}
 dot_vio_met <- ggplot(c_MT_vs_met, aes(x = val_state2, y = ag_dis2), fill = val_state2) +
-  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "goldenrod", alpha = 0.05) +
-  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 2) +
-  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "blue", alpha = 0.05) +
+  #stat_summary(fun.y = min, colour = "gold", geom = "point", size = 2) +
+  #stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
   geom_violin(alpha = 0.01) +
   scale_fill_viridis(discrete=TRUE) +
   xlab("Metaphor") + ylab("Mean Level of Agreement") +
-  ggtitle("To what extent do you agree \nwith these value statements?") +
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   theme_pander()
 
 dot_vio_met
@@ -144,15 +145,48 @@ c_MT_vs_rel <- c_MT %>%
 
 rel_bar <- ggplot(c_MT_vs_rel, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE, "Relational") +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
-  ggtitle("Relational: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("Relational:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
 
 rel_bar
 
 ggsave(rel_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/rel_bar.pdf")
 ```
 
+Instrumental
+```{r}
+c_MT_vs_ins <- c_MT %>% 
+  filter(val_state2 == "extract_r_ins" | val_state2 == "clean_inst" | val_state2 == "loss_r_ins")
+
+ins_bar <- ggplot(c_MT_vs_ins, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ylab("Count") +
+  ggtitle("Instrumental Value:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+
+ins_bar
+ggsave(ins_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/ins_bar.pdf")
+```
+
+Moral
+Relational
+
+```{r}
+c_MT_vs_mor <- c_MT %>% 
+  filter(val_state2 == "decade_r_mor" | val_state2 == "right_r_mor")
+
+mor_bar <- ggplot(c_MT_vs_mor, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
+  ggtitle("Moral:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+
+mor_bar
+
+ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf")
+```
 dot plot 
 
 ```{r}
@@ -162,7 +196,7 @@ all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = ag_dis2, color = Sub_pop)
   xlab("Value Statement") + ylab("Response\n1= strongly disagree; 5 = strongly agree") +
   scale_fill_viridis(discrete=TRUE) +
   scale_color_viridis(discrete=TRUE) +
-  ggtitle("To what extent do you agree with these value statements?\n yellow = MT; blue = farmer") +
+  ggtitle("To what extent do you agree with these statements?\n yellow = MT; blue = farmer") +
   theme_pander()
 
 all_val_st_dot
