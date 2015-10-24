@@ -9,9 +9,11 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE")
+
 
 ```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE")
+
 library(ggplot2)
 library(ggthemes)
 library(wesanderson)
@@ -65,9 +67,45 @@ write.xlsx(desmat1, "desmat1.xlsx")
 ```
 str(desmat1)
 
-Match my JMP CE configuration to the desmat1 
+manually match my JMP CE configuration to the desmat1 format
 ```{r}
 desmat2 <- read.xlsx("desmat2", 1)
+
+```
+
+The R CE package did not include the the first level of each attribute. I manually insterted it into the excel sheet, then copy and pasted as values. 
+
+```{r}
+desmat3 <- read.csv("desmat3.csv")
+str(desmat3)
+str(desmat1)
+```
+
+Convert integer to numeric
+
+```{r}
+desmat3$X <- as.numeric(desmat3$X)
+desmat3$BLOCK <- as.numeric(desmat3$BLOCK)
+desmat3$QES <- as.numeric(desmat3$QES)
+desmat3$ALT <- as.numeric(desmat3$ALT)
+desmat3$ASC <- as.numeric(desmat3$ASC)
+desmat3$big.loss <- as.numeric(desmat3$big.loss)
+desmat3$small.loss <- as.numeric(desmat3$small.loss)
+desmat3$small.gain <- as.numeric(desmat3$small.gain)
+desmat3$big.gain <- as.numeric(desmat3$big.gain)
+desmat3$state <- as.numeric(desmat3$state)
+desmat3$municipal <- as.numeric(desmat3$municipal)
+desmat3$private <- as.numeric(desmat3$private)
+desmat3$cooperative <- as.numeric(desmat3$cooperative)
+desmat3$mi1 <- as.numeric(desmat3$mi1)
+desmat3$mi4 <- as.numeric(desmat3$mi4)
+desmat3$mi8 <- as.numeric(desmat3$mi8)
+desmat3$mi10 <- as.numeric(desmat3$mi10)
+desmat3$bill <- as.numeric(desmat3$bill)
+str(desmat3)
+```
+
+```{r}
 
 ```
 
