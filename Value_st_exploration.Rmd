@@ -111,7 +111,7 @@ c_MT_vs_met <- c_MT %>%
 
 met_bar <- ggplot(c_MT_vs_met, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
   ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   facet_wrap(~val_state2)
@@ -271,18 +271,37 @@ Linear Models
 
 Mean NEP and mean relational 
 
+install.packages("stargazer")
+
+
 ```{r}
 ctbl <- cval %>%
   tbl_df
 
 cMT <- cval %>% 
   filter(Sub_pop == "MT")
-
+View(cMT)
 
 lm_nep_rel <- lm(cMT$mean_nep ~ cMT$mean_rel)
 summary(lm_nep_rel)
+lms <- summary(lm_nep_rel)
 coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+#stargazer(linear.1)
+#library(stargazer)
+#stargazer(attitude)
+#linear.1 <- lm(mean_nep ~ mean_rel, data=cMT)
+#summary(linear.1)
+```
 
+```{r kable}
+out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
+library(knitr)
+kable(summary(out)$coef, digits=2)
+```
+
+cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+
+```{r}
 nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
   geom_point(alpha = 0.5) +
   scale_color_viridis(discrete=TRUE) +

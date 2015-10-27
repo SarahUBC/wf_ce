@@ -91,8 +91,8 @@ c_MT_vs <- c_MT %>%
 no_means_bar <- ggplot(c_MT_vs, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE) +
-  xlab("Response\n1=strongly disagree, not green; 5=strongly agree, green") +
-  ggtitle("To what extent do you agree with these value statements?") + facet_wrap(~val_state2)
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("To what extent do you agree with these statements?") + facet_wrap(~val_state2)
 
 no_means_bar
 ```
@@ -116,9 +116,9 @@ c_MT_vs_nep <- c_MT %>%
 
 NEP_bar <- ggplot(c_MT_vs_nep, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("NEP: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("NEP:\nTo what extent do you agree \nwith these statements?") + facet_wrap(~val_state2)
 
 NEP_bar
 ```
@@ -142,9 +142,10 @@ c_MT_vs_met <- c_MT %>%
 
 met_bar <- ggplot(c_MT_vs_met, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("Metaphors: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
+  facet_wrap(~val_state2)
 
 met_bar
 ```
@@ -164,24 +165,16 @@ Violin plots just for metaphors
 
 ```r
 dot_vio_met <- ggplot(c_MT_vs_met, aes(x = val_state2, y = ag_dis2), fill = val_state2) +
-  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "goldenrod", alpha = 0.05) +
-  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 2) +
-  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "blue", alpha = 0.05) +
+  #stat_summary(fun.y = min, colour = "gold", geom = "point", size = 2) +
+  #stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
   geom_violin(alpha = 0.01) +
   scale_fill_viridis(discrete=TRUE) +
   xlab("Metaphor") + ylab("Mean Level of Agreement") +
-  ggtitle("To what extent do you agree \nwith these value statements?") +
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   theme_pander()
 
 dot_vio_met
-```
-
-```
-## Warning: Removed 3 rows containing missing values (stat_summary).
-```
-
-```
-## Warning: Removed 3 rows containing missing values (stat_summary).
 ```
 
 ```
@@ -203,14 +196,6 @@ ggsave(dot_vio_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_
 ```
 
 ```
-## Warning: Removed 3 rows containing missing values (stat_summary).
-```
-
-```
-## Warning: Removed 3 rows containing missing values (stat_summary).
-```
-
-```
 ## Warning: Removed 3 rows containing non-finite values (stat_ydensity).
 ```
 
@@ -226,9 +211,9 @@ c_MT_vs_rel <- c_MT %>%
 
 rel_bar <- ggplot(c_MT_vs_rel, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
-  scale_fill_viridis(discrete=TRUE, "Relational") +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
-  ggtitle("Relational: To what extent do you agree \nwith these value statements?") + facet_wrap(~val_state2)
+  ggtitle("Relational:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
 
 rel_bar
 ```
@@ -243,6 +228,58 @@ ggsave(rel_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/rel_bar.pdf"
 ## Saving 7 x 5 in image
 ```
 
+Instrumental
+
+```r
+c_MT_vs_ins <- c_MT %>% 
+  filter(val_state2 == "extract_r_ins" | val_state2 == "clean_inst" | val_state2 == "loss_r_ins")
+
+ins_bar <- ggplot(c_MT_vs_ins, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ylab("Count") +
+  ggtitle("Instrumental Value:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+
+ins_bar
+```
+
+![](Value_st_exploration_files/figure-html/unnamed-chunk-11-1.png) 
+
+```r
+ggsave(ins_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/ins_bar.pdf")
+```
+
+```
+## Saving 7 x 5 in image
+```
+
+Moral
+Relational
+
+
+```r
+c_MT_vs_mor <- c_MT %>% 
+  filter(val_state2 == "decade_r_mor" | val_state2 == "right_r_mor")
+
+mor_bar <- ggplot(c_MT_vs_mor, aes(x = ag_dis, fill = ag_dis)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
+  ggtitle("Moral:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+
+mor_bar
+```
+
+![](Value_st_exploration_files/figure-html/unnamed-chunk-12-1.png) 
+
+```r
+ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf")
+```
+
+```
+## Saving 7 x 5 in image
+```
 dot plot 
 
 
@@ -253,7 +290,7 @@ all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = ag_dis2, color = Sub_pop)
   xlab("Value Statement") + ylab("Response\n1= strongly disagree; 5 = strongly agree") +
   scale_fill_viridis(discrete=TRUE) +
   scale_color_viridis(discrete=TRUE) +
-  ggtitle("To what extent do you agree with these value statements?\n yellow = MT; blue = farmer") +
+  ggtitle("To what extent do you agree with these statements?\n yellow = MT; blue = farmer") +
   theme_pander()
 
 all_val_st_dot
@@ -263,7 +300,7 @@ all_val_st_dot
 ## Warning: Removed 1314 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-11-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
 
 ```r
 ggsave(all_val_st_dot, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/all_val_st_dot.pdf")
@@ -293,7 +330,7 @@ means_hist <- ggplot(c_MT_means, aes(x = ag_dis2, fill = val_state2)) +
 means_hist
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-12-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
 
 ```r
 ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_hist.pdf")
@@ -318,7 +355,7 @@ mean_val_st_box
 ## Warning: Removed 179 rows containing non-finite values (stat_boxplot).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
 
 ```r
 ggsave(mean_val_st_box, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mean_val_st_box.pdf") 
@@ -378,7 +415,7 @@ box_dot_means
 ## Warning: Removed 154 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
 
 ```r
 ggsave(box_dot_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/box_dot_means.pdf") 
@@ -453,7 +490,7 @@ dot_vio_means
 ## Warning: Removed 179 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-17-1.png) 
 
 ```r
 ggsave(dot_vio_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_means.pdf")
@@ -484,6 +521,9 @@ Linear Models
 
 Mean NEP and mean relational 
 
+install.packages("stargazer")
+
+
 
 ```r
 ctbl <- cval %>%
@@ -491,7 +531,7 @@ ctbl <- cval %>%
 
 cMT <- cval %>% 
   filter(Sub_pop == "MT")
-
+View(cMT)
 
 lm_nep_rel <- lm(cMT$mean_nep ~ cMT$mean_rel)
 summary(lm_nep_rel)
@@ -519,6 +559,7 @@ summary(lm_nep_rel)
 ```
 
 ```r
+lms <- summary(lm_nep_rel)
 coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 ```
 
@@ -526,6 +567,29 @@ coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 ##  (Intercept) cMT$mean_rel 
 ##    1.3950615    0.6926811
 ```
+
+```r
+#stargazer(linear.1)
+#library(stargazer)
+#stargazer(attitude)
+#linear.1 <- lm(mean_nep ~ mean_rel, data=cMT)
+#summary(linear.1)
+```
+
+
+```r
+out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
+library(knitr)
+kable(summary(out)$coef, digits=2)
+```
+
+                Estimate   Std. Error   t value   Pr(>|t|)
+-------------  ---------  -----------  --------  ---------
+(Intercept)         1.40         0.26      5.43          0
+cMT$mean_rel        0.69         0.07     10.06          0
+
+cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+
 
 ```r
 nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
@@ -539,7 +603,7 @@ nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
 nep_rel_pt 
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-19-1.png) 
 
 ```r
 ggsave(nep_rel_pt, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/nep_rel_pt.pdf")
@@ -599,7 +663,7 @@ ggplot(cMT, aes(x = mean_mor, y = mean_inst)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-17-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-20-1.png) 
 
 
 ```r
@@ -717,4 +781,4 @@ ggplot(cMT, aes(x = mean_met, y = mean_rel)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-20-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-23-1.png) 

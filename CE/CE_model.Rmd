@@ -30,11 +30,8 @@ library(xlsx)
 
 load choice experiment responses data
 
-```{r}
-d <- read.csv("~/Documents/R_2015/wf_ce/CE/2015_10_23_WF_CE.csv")
-```
 
-Figure out how the data should be formatted.
+Figure out how the data should be formatted if I had used a rotational design.
 
 ```{r}
 des1 <- rotation.design(
@@ -106,18 +103,19 @@ str(desmat3)
 ```
 
 ```{r}
-cer <- read.csv("2015_10_23_WF_CE.csv")
+cer <- read.csv("cer_2015_10_23_min.csv")
+cer_big <- read.csv("cer_2015_10_23.csv")
 
-cer$id <- as.numeric(cer$id)
+cer$ID <- as.numeric(cer$ID)
 cer$Block <- as.numeric(cer$Block)
-cer$Q1 <- as.numeric(cer$Q1)
-cer$Q2 <- as.numeric(cer$Q2)
-cer$Q3 <- as.numeric(cer$Q3)
-cer$Q4 <- as.numeric(cer$Q4)
-cer$Q5 <- as.numeric(cer$Q5)
-cer$Q6 <- as.numeric(cer$Q6)
-cer$Q7 <- as.numeric(cer$Q7)
-cer$Q8 <- as.numeric(cer$Q8)
+cer$q1 <- as.numeric(cer$q1)
+cer$q2 <- as.numeric(cer$q2)
+cer$q3 <- as.numeric(cer$q3)
+cer$q4 <- as.numeric(cer$q4)
+cer$q5 <- as.numeric(cer$q5)
+cer$q6 <- as.numeric(cer$q6)
+cer$q7 <- as.numeric(cer$q7)
+cer$q8 <- as.numeric(cer$q8)
 
 str(cer)
 ```
@@ -127,9 +125,14 @@ This function makes a data set used for a conditional logit model analysis with 
 make.dataset(respondent.dataset, design.matrix,
                  choice.indicators, detail = FALSE)
 
+ choice.indicators = 
+  c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"), 
+ design.matrix = desmat2)
 ```{r}
-ds <- (cer, desmat3, choice.indicators =
-    c("Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"), detail = FALSE)
+str(cer)
+ds <- make.dataset(respondent.dataset = cer, design.matrix = desmat3, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"))
+
+ds
 ```
 
 
