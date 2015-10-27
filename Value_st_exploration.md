@@ -10,7 +10,6 @@ Setup
 ```r
 library(ggplot2)
 library(ggthemes)
-library(wesanderson)
 library(viridis)
 suppressMessages(library(dplyr))
 library(knitr)
@@ -24,8 +23,8 @@ Input data
 
 ```r
 setwd("/Users/sarahklain/Documents/R_2015/wf_ce")
-cm <- read.csv("Constr_means_MT.csv")
-cval <- read.csv("Coded_val_10_20_2015.csv")
+#cm <- read.csv("Constr_means_MT.csv")
+cval <- read.csv("env_val/EnVal_subgroups_10_26_2015.csv")
 ```
 
 str(cval)
@@ -35,24 +34,10 @@ I did exploratory plots of the data
 
 
 ```r
-cval2 <- tidyr::gather(cval, "val_state", "ag_dis", 3:30)
-```
+cval2 <- tidyr::gather(cval, "val_state", "response", 3:38)
+cval2$response_f <- as.factor(cval2$response)
 
-```
-## Warning: attributes are not identical across measure variables; they will
-## be dropped
-```
-
-```r
-cval2$ag_dis2 <- as.numeric(cval2$ag_dis) 
-```
-
-```
-## Warning: NAs introduced by coercion
-```
-
-```r
-cval2$val_state2 <- factor(cval2$val_state, levels=c("abuse_nep","bal_r_nep", "crisis_r_nep", "spaceship_nep", "bau_nep", "extract_r_ins", "clean_inst", "loss_r_ins", "comm_rel", "iden_rel", "kin_rel","resp_rel","wild_rel", "health_rel", "other_rel", "tech_r",  "decade_r_mor","right_r_mor",  "kin_met", "resp_met", "iden_met", "other_met", "mean_nep", "mean_rel", "mean_met", "mean_inst", "mean_mor"))
+#cval2$val_state <- factor(cval2$val_state, levels=c("abuse_nep","bal_r_nep", "crisis_r_nep", "spaceship_nep", "bau_nep", "extract_r_ins", "clean_inst", "loss_r_ins", "comm_rel", "iden_rel", "kin_rel","resp_rel","wild_rel", "health_rel2", "other_rel", "tech_r",  "decade_r_mor","right_r_mor",  "kin_met", "resp_met", "iden_met", "other_met", "mean_nep", "mean_rel", "mean_met", "mean_inst", "mean_mor"))
 ```
 str(cval2)
 head(cval2)
@@ -62,7 +47,7 @@ Both MT & farmers
 
 
 ```r
-#ggplot(cval2, aes(x = val_state2, y = ag_dis2, fill = Sub_pop)) +
+#ggplot(cval2, aes(x = val_state, y = ag_dis2, fill = Sub_pop)) +
 # geom_boxplot(width=1) +
 # theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
 #  xlab("Value Statement") + ylab("Response\n1= strongly disagree; 5 = strongly agree ") +
@@ -86,13 +71,15 @@ Bar chart, all value statements except means
 
 ```r
 c_MT_vs <- c_MT %>% 
-  filter(val_state2 != "mean_nep" & val_state2 != "mean_rel" & val_state2 != "mean_inst" & val_state2 != "mean_mor"& val_state2 != "mean_met")
+  filter(val_state != "mean_nep" & val_state != "mean_rel" & val_state != "mean_inst" & val_state != "mean_mor" & val_state != "mean_met" & val_state != "health_r_rel" & val_state != "health_rel")
 
-no_means_bar <- ggplot(c_MT_vs, aes(x = ag_dis, fill = ag_dis)) +
-  geom_histogram() +
-  scale_fill_viridis(discrete=TRUE) +
+no_means_bar <- ggplot(c_MT_vs, aes(x = response_f, fill = response_f)) +
+  geom_histogram(binwidth = 0.5) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("To what extent do you agree with these statements?") + facet_wrap(~val_state2)
+  ggtitle("To what extent do you agree with these statements?") + 
+  facet_wrap(~val_state) +
+  coord_cartesian(xlim = c(0, 6)) 
 
 no_means_bar
 ```
@@ -112,13 +99,13 @@ NEP
 
 ```r
 c_MT_vs_nep <- c_MT %>% 
-  filter(val_state2 == "abuse_nep" | val_state2 == "bal_r_nep" | val_state2 == "crisis_r_nep" | val_state2 == "bau_nep")
-
-NEP_bar <- ggplot(c_MT_vs_nep, aes(x = ag_dis, fill = ag_dis)) +
-  geom_histogram() +
+  filter(val_state == "abuse_nep" | val_state == "bal_r_nep" | val_state == "crisis_r_nep" | val_state == "bau_nep")
+  
+NEP_bar <- ggplot(c_MT_vs_nep, aes(x = response_f, fill = response_f)) +
+  geom_histogram(binwidth = 0.5) +
   scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("NEP:\nTo what extent do you agree \nwith these statements?") + facet_wrap(~val_state2)
+  ggtitle("NEP:\nTo what extent do you agree \nwith these statements?") + facet_wrap(~val_state)
 
 NEP_bar
 ```
@@ -138,14 +125,14 @@ Metaphors
 
 ```r
 c_MT_vs_met <- c_MT %>% 
-  filter(val_state2 == "kin_met" | val_state2 == "resp_met" | val_state2 == "iden_met" | val_state2 == "other_met")
+  filter(val_state == "kin_met" | val_state == "resp_met" | val_state == "iden_met" | val_state == "other_met")
 
-met_bar <- ggplot(c_MT_vs_met, aes(x = ag_dis, fill = ag_dis)) +
+met_bar <- ggplot(c_MT_vs_met, aes(x = response_f, fill = response_f)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
-  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  xlab("Response\n1=Yes, this is very much like how I think about the ocean;\n5=No, this is very unlike how I think about the ocean") +
   ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
-  facet_wrap(~val_state2)
+  facet_wrap(~val_state)
 
 met_bar
 ```
@@ -164,12 +151,10 @@ Violin plots just for metaphors
 
 
 ```r
-dot_vio_met <- ggplot(c_MT_vs_met, aes(x = val_state2, y = ag_dis2), fill = val_state2) +
-  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "blue", alpha = 0.05) +
-  #stat_summary(fun.y = min, colour = "gold", geom = "point", size = 2) +
-  #stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
+dot_vio_met <- ggplot(c_MT_vs_met, aes(x = c_MT_vs_met$val_state, y = response, color =  c_MT_vs_met$val_state)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1), alpha = 0.2) +
   geom_violin(alpha = 0.01) +
-  scale_fill_viridis(discrete=TRUE) +
+  scale_color_viridis(discrete=TRUE, option = "plasma") +
   xlab("Metaphor") + ylab("Mean Level of Agreement") +
   ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   theme_pander()
@@ -202,18 +187,19 @@ ggsave(dot_vio_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_
 ```
 ## Warning: Removed 3 rows containing missing values (geom_point).
 ```
+
 Relational
 
 
 ```r
 c_MT_vs_rel <- c_MT %>% 
-  filter(val_state2 == "comm_rel" | val_state2 == "iden_rel" | val_state2 == "kin_rel" | val_state2 == "wild_rel" | val_state2 == "health_rel" | val_state2 == "other_rel" )
-
-rel_bar <- ggplot(c_MT_vs_rel, aes(x = ag_dis, fill = ag_dis)) +
+  filter(val_state == "comm_rel" | val_state == "iden_rel" | val_state == "kin_rel" | val_state == "wild_rel" | val_state == "health_rel2" | val_state == "other_rel" )
+  
+rel_bar <- ggplot(c_MT_vs_rel, aes(x = response_f, fill = response_f)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
-  xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
-  ggtitle("Relational:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+  xlab("Response\n1=strongly disagree;\n 5=strongly agree") +
+  ggtitle("Relational:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
 
 rel_bar
 ```
@@ -232,14 +218,14 @@ Instrumental
 
 ```r
 c_MT_vs_ins <- c_MT %>% 
-  filter(val_state2 == "extract_r_ins" | val_state2 == "clean_inst" | val_state2 == "loss_r_ins")
+  filter(val_state == "extract_r_ins" | val_state == "clean_inst" | val_state == "loss_r_ins")
 
-ins_bar <- ggplot(c_MT_vs_ins, aes(x = ag_dis, fill = ag_dis)) +
+ins_bar <- ggplot(c_MT_vs_ins, aes(x = response_f, fill = response_f)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
   ylab("Count") +
-  ggtitle("Instrumental Value:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+  ggtitle("Instrumental Value:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
 
 ins_bar
 ```
@@ -255,18 +241,17 @@ ggsave(ins_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/ins_bar.pdf"
 ```
 
 Moral
-Relational
 
 
 ```r
 c_MT_vs_mor <- c_MT %>% 
-  filter(val_state2 == "decade_r_mor" | val_state2 == "right_r_mor")
+  filter(val_state == "decade_r_mor" | val_state == "right_r_mor")
 
-mor_bar <- ggplot(c_MT_vs_mor, aes(x = ag_dis, fill = ag_dis)) +
+mor_bar <- ggplot(c_MT_vs_mor, aes(x = response_f, fill = response_f)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
   xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
-  ggtitle("Moral:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state2)
+  ggtitle("Moral:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
 
 mor_bar
 ```
@@ -282,55 +267,39 @@ ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf"
 ```
 dot plot 
 
-
-```r
-all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = ag_dis2, color = Sub_pop)) +
+#```{r}
+ all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = response, color = Sub_pop)) +
  geom_jitter(alpha = 0.01) +
  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Value Statement") + ylab("Response\n1= strongly disagree; 5 = strongly agree") +
   scale_fill_viridis(discrete=TRUE) +
   scale_color_viridis(discrete=TRUE) +
   ggtitle("To what extent do you agree with these statements?\n yellow = MT; blue = farmer") +
-  theme_pander()
+  theme_pander() +
+  coord_cartesian(ylim = c(1, 5)) 
 
 all_val_st_dot
-```
 
-```
-## Warning: Removed 1314 rows containing missing values (geom_point).
-```
-
-![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
-
-```r
 ggsave(all_val_st_dot, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/all_val_st_dot.pdf")
-```
-
-```
-## Saving 7 x 5 in image
-```
-
-```
-## Warning: Removed 1314 rows containing missing values (geom_point).
-```
  
 Constructed scores (means by aggregated categories)
  
 
 ```r
 c_MT_means <- c_MT <- ctbl %>% 
-  filter(val_state2 == "mean_nep" | val_state2 == "mean_rel" | val_state2 == "mean_inst" | val_state2 == "mean_mor" | val_state2 == "mean_met" )
+  filter(val_state == "mean_nep" | val_state == "mean_rel" | val_state == "mean_inst" | val_state == "mean_mor" | val_state == "mean_met" )
 
-means_hist <- ggplot(c_MT_means, aes(x = ag_dis2, fill = val_state2)) +
-  geom_histogram(binwidth =.5) +
+means_hist <- ggplot(c_MT_means, aes(x = response, fill = val_state)) +
+  geom_histogram(binwidth = 0.5) +
   scale_fill_viridis(discrete=TRUE, "Category of\nValue Statement", option = "plasma") +
   xlab("Response\n1=strongly disagree; 5=strongly agree") +
-  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") + facet_wrap(~val_state2)
+  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") + facet_wrap(~val_state) +
+  coord_cartesian(xlim = c(1, 5)) 
 
 means_hist
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
 
 ```r
 ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_hist.pdf")
@@ -342,20 +311,21 @@ ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_his
 
 
 ```r
-mean_val_st_box <- ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2, fill = val_state2)) +
+mean_val_st_box <- ggplot(c_MT_means, aes(x = val_state, y = response, fill = val_state)) +
  geom_boxplot(binwidth = 0.5) +
   xlab("Types of Constructed Mean") + ylab("Response\n1= stongly disagree; 5 = strongly agree") +
   scale_fill_viridis(discrete=TRUE, "Category of Value\nStatement", option = "plasma") +
-  ggtitle("To what extent do you agree\nwith these value statements?")
+  ggtitle("To what extent do you agree\nwith these value statements?") +
+  coord_cartesian(ylim = c(1, 5))
 
 mean_val_st_box
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_boxplot).
+## Warning: Removed 1206 rows containing non-finite values (stat_boxplot).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
 
 ```r
 ggsave(mean_val_st_box, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mean_val_st_box.pdf") 
@@ -366,12 +336,12 @@ ggsave(mean_val_st_box, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mean
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_boxplot).
+## Warning: Removed 1206 rows containing non-finite values (stat_boxplot).
 ```
 
 
 ```r
-box_dot_means <- ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2)) +
+box_dot_means <- ggplot(c_MT_means, aes(x = val_state, y = response)) +
   geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 1/5) +
   stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
   stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
@@ -384,38 +354,42 @@ box_dot_means
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_boxplot).
+## Warning: Removed 1206 rows containing non-finite values (stat_boxplot).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (geom_point).
+## Warning: Removed 1206 rows containing missing values (geom_point).
 ```
 
 ```
-## Warning: Removed 11 rows containing missing values (geom_point).
+## Warning: Removed 14 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 5 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 5 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 68 rows containing missing values (geom_point).
 ```
 
 ```
 ## Warning: Removed 4 rows containing missing values (geom_point).
 ```
 
-```
-## Warning: Removed 41 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 154 rows containing missing values (geom_point).
-```
-
-![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
 
 ```r
 ggsave(box_dot_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/box_dot_means.pdf") 
@@ -426,42 +400,46 @@ ggsave(box_dot_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/box_do
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_boxplot).
+## Warning: Removed 1206 rows containing non-finite values (stat_boxplot).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (geom_point).
+## Warning: Removed 1206 rows containing missing values (geom_point).
 ```
 
 ```
-## Warning: Removed 11 rows containing missing values (geom_point).
+## Warning: Removed 14 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 5 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 5 rows containing missing values (geom_point).
+```
+
+```
+## Warning: Removed 68 rows containing missing values (geom_point).
 ```
 
 ```
 ## Warning: Removed 4 rows containing missing values (geom_point).
 ```
 
-```
-## Warning: Removed 41 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 154 rows containing missing values (geom_point).
-```
-
 And a squiggly violin plot! 
 
 
 ```r
-dot_vio_means <- ggplot(c_MT_means, aes(x = val_state2, y = ag_dis2), fill = val_state2) +
+dot_vio_means <- ggplot(c_MT_means, aes(x = val_state, y = response), fill = val_state) +
   geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 0.05) +
   stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 2) +
   stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
@@ -475,22 +453,22 @@ dot_vio_means
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_ydensity).
+## Warning: Removed 1206 rows containing non-finite values (stat_ydensity).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (geom_point).
+## Warning: Removed 1206 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-17-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
 
 ```r
 ggsave(dot_vio_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_means.pdf")
@@ -501,19 +479,19 @@ ggsave(dot_vio_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vi
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (stat_summary).
+## Warning: Removed 1206 rows containing missing values (stat_summary).
 ```
 
 ```
-## Warning: Removed 179 rows containing non-finite values (stat_ydensity).
+## Warning: Removed 1206 rows containing non-finite values (stat_ydensity).
 ```
 
 ```
-## Warning: Removed 179 rows containing missing values (geom_point).
+## Warning: Removed 1206 rows containing missing values (geom_point).
 ```
 
 
@@ -531,7 +509,6 @@ ctbl <- cval %>%
 
 cMT <- cval %>% 
   filter(Sub_pop == "MT")
-View(cMT)
 
 lm_nep_rel <- lm(cMT$mean_nep ~ cMT$mean_rel)
 summary(lm_nep_rel)
@@ -543,19 +520,19 @@ summary(lm_nep_rel)
 ## lm(formula = cMT$mean_nep ~ cMT$mean_rel)
 ## 
 ## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -2.3944 -0.3658  0.1074  0.4905  1.5269 
+##      Min       1Q   Median       3Q      Max 
+## -2.20226 -0.29636  0.07481  0.39760  1.48223 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   1.39506    0.25707   5.427 9.99e-08 ***
-## cMT$mean_rel  0.69268    0.06883  10.063  < 2e-16 ***
+## (Intercept)   1.10979    0.19461   5.703  2.3e-08 ***
+## cMT$mean_rel  0.72312    0.04878  14.823  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.6649 on 398 degrees of freedom
-## Multiple R-squared:  0.2028,	Adjusted R-squared:  0.2008 
-## F-statistic: 101.3 on 1 and 398 DF,  p-value: < 2.2e-16
+## Residual standard error: 0.5977 on 398 degrees of freedom
+## Multiple R-squared:  0.3557,	Adjusted R-squared:  0.3541 
+## F-statistic: 219.7 on 1 and 398 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -565,7 +542,7 @@ coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 
 ```
 ##  (Intercept) cMT$mean_rel 
-##    1.3950615    0.6926811
+##    1.1097881    0.7231188
 ```
 
 ```r
@@ -580,13 +557,13 @@ coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 ```r
 out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
 library(knitr)
-kable(summary(out)$coef, digits=2)
+kable(summary(out)$coef, digits=3)
 ```
 
                 Estimate   Std. Error   t value   Pr(>|t|)
 -------------  ---------  -----------  --------  ---------
-(Intercept)         1.40         0.26      5.43          0
-cMT$mean_rel        0.69         0.07     10.06          0
+(Intercept)        1.110        0.195     5.703          0
+cMT$mean_rel       0.723        0.049    14.823          0
 
 cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 
@@ -603,7 +580,7 @@ nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
 nep_rel_pt 
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-19-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-18-1.png) 
 
 ```r
 ggsave(nep_rel_pt, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/nep_rel_pt.pdf")
@@ -663,7 +640,7 @@ ggplot(cMT, aes(x = mean_mor, y = mean_inst)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-20-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-19-1.png) 
 
 
 ```r
@@ -678,18 +655,18 @@ summary(lm_inst_rel)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.97497 -0.25155  0.06489  0.17093  1.77476 
+## -0.96391 -0.25276  0.06931  0.17046  1.74724 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   2.94621    0.16611  17.737   <2e-16 ***
-## cMT$mean_rel  0.07972    0.04448   1.792   0.0738 .  
+## (Intercept)   3.04600    0.14009  21.744   <2e-16 ***
+## cMT$mean_rel  0.04958    0.03512   1.412    0.159    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.4296 on 398 degrees of freedom
-## Multiple R-squared:  0.008008,	Adjusted R-squared:  0.005515 
-## F-statistic: 3.213 on 1 and 398 DF,  p-value: 0.07382
+## Residual standard error: 0.4303 on 398 degrees of freedom
+## Multiple R-squared:  0.004984,	Adjusted R-squared:  0.002484 
+## F-statistic: 1.994 on 1 and 398 DF,  p-value: 0.1587
 ```
 
 ```r
@@ -698,7 +675,7 @@ coef(lm_inst_rel)
 
 ```
 ##  (Intercept) cMT$mean_rel 
-##   2.94621051   0.07972389
+##   3.04599762   0.04958329
 ```
 
 
@@ -749,19 +726,19 @@ summary(lm_met_rel)
 ## lm(formula = cMT$mean_met ~ cMT$mean_rel)
 ## 
 ## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.8122 -0.4308 -0.0140  0.4115  3.4027 
+##      Min       1Q   Median       3Q      Max 
+## -3.00427 -0.42009 -0.00427  0.35730  1.66410 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   7.06535    0.24181   29.22   <2e-16 ***
-## cMT$mean_rel -1.26283    0.06475  -19.50   <2e-16 ***
+## (Intercept)  -0.38061    0.20020  -1.901    0.058 .  
+## cMT$mean_rel  1.01267    0.05019  20.179   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.6254 on 398 degrees of freedom
-## Multiple R-squared:  0.4887,	Adjusted R-squared:  0.4874 
-## F-statistic: 380.4 on 1 and 398 DF,  p-value: < 2.2e-16
+## Residual standard error: 0.6149 on 398 degrees of freedom
+## Multiple R-squared:  0.5057,	Adjusted R-squared:  0.5045 
+## F-statistic: 407.2 on 1 and 398 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -770,7 +747,7 @@ coef(lm_met_rel)
 
 ```
 ##  (Intercept) cMT$mean_rel 
-##     7.065353    -1.262829
+##   -0.3806085    1.0126737
 ```
 
 ```r
@@ -781,4 +758,4 @@ ggplot(cMT, aes(x = mean_met, y = mean_rel)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-23-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-22-1.png) 
