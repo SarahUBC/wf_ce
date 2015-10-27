@@ -26,6 +26,8 @@ library(broom)
 library(support.CEs)
 # install.packages("xlsx")
 library(xlsx)
+library(survival)
+library(mlogit)
 ```
 
 load choice experiment responses data
@@ -49,6 +51,21 @@ des1 <- rotation.design(
 des1
 ```
 
+lma design
+```{r}
+des_lma <- Lma.design(
+     attribute.names = list(
+       hab_qual = c("big loss", "small loss", "small gain", "big gain"), 
+       own = c("state", "municipal", "private", "cooperative"),
+       vis = c("mi1", "mi4", "mi8", "mi10"), bill = c("1", "5", "10", "20")), 
+       nalternatives = 2,
+       nblocks = 4, 
+       row.renames = FALSE,
+       seed = 987)
+
+des_lma
+```
+
 The format for the design matrix
 
 ```{r}
@@ -62,7 +79,20 @@ desmat1 <-make.design.matrix(
 desmat1
 write.xlsx(desmat1, "desmat1.xlsx")
 ```
-str(desmat1)
+
+
+
+```{r}
+desmat_lma <-make.design.matrix(
+  choice.experiment.design = des_lma,
+  optout = TRUE,
+  categorical.attributes = c("hab_qual", "own", "vis"), 
+  continuous.attributes = c("bill"),
+  unlabeled = TRUE)
+
+desmat_lma
+write.xlsx(desmat_lma, "desmat_lma.xlsx")
+```
 
 manually match my JMP CE configuration to the desmat1 format
 ```{r}
@@ -81,7 +111,7 @@ str(desmat1)
 Convert integer to numeric
 
 ```{r}
-desmat3$X <- as.numeric(desmat3$X)
+desmat3$X <- NULL
 desmat3$BLOCK <- as.numeric(desmat3$BLOCK)
 desmat3$QES <- as.numeric(desmat3$QES)
 desmat3$ALT <- as.numeric(desmat3$ALT)
@@ -106,16 +136,16 @@ str(desmat3)
 cer <- read.csv("cer_2015_10_23_min.csv")
 cer_big <- read.csv("cer_2015_10_23.csv")
 
-cer$ID <- as.numeric(cer$ID)
-cer$Block <- as.numeric(cer$Block)
-cer$q1 <- as.numeric(cer$q1)
-cer$q2 <- as.numeric(cer$q2)
-cer$q3 <- as.numeric(cer$q3)
-cer$q4 <- as.numeric(cer$q4)
-cer$q5 <- as.numeric(cer$q5)
-cer$q6 <- as.numeric(cer$q6)
-cer$q7 <- as.numeric(cer$q7)
-cer$q8 <- as.numeric(cer$q8)
+#cer$ID <- as.numeric(cer$ID)
+#cer$Block <- as.numeric(cer$Block)
+#cer$q1 <- as.numeric(cer$q1)
+#cer$q2 <- as.numeric(cer$q2)
+#cer$q3 <- as.numeric(cer$q3)
+#cer$q4 <- as.numeric(cer$q4)
+#cer$q5 <- as.numeric(cer$q5)
+#cer$q6 <- as.numeric(cer$q6)
+#cer$q7 <- as.numeric(cer$q7)
+#cer$q8 <- as.numeric(cer$q8)
 
 str(cer)
 ```
@@ -134,5 +164,33 @@ ds <- make.dataset(respondent.dataset = cer, design.matrix = desmat3, choice.ind
 
 ds
 ```
+
+```{r}
+d.pork <- Lma.design(
+      attribute.names = list(
+        Price = c("100", "130", "160", "190")),
+      nalternatives = 3,
+      nblocks = 4,
+      row.renames = FALSE,
+seed = 987)
+data(pork)
+    dm.pork <- make.design.matrix(
+      choice.experiment.design = d.pork,
+      optout = TRUE,
+      continuous.attributes = c("Price"),
+      unlabeled = FALSE)
+    ds.pork <- make.dataset(
+      respondent.dataset = pork,
+      choice.indicators =
+        c("q1", "q2", "q3", "q4"),
+      design.matrix = dm.pork)
+    fm.pork <- RES ~ ASC1 + Price1 +
+                     ASC2 + Price2 +
+                     ASC3 + Price3 +
+                     strata(STR)
+    out.pork <- clogit(fm.pork, data = ds.pork)
+out.pork
+```
+
 
 

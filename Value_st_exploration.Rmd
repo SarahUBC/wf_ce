@@ -112,7 +112,7 @@ c_MT_vs_met <- c_MT %>%
 met_bar <- ggplot(c_MT_vs_met, aes(x = ag_dis, fill = ag_dis)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
-  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  xlab("Response\n1=Yes, this is very much like how I think about the ocean;\n5=No, this is very unlike how I think about the ocean") +
   ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   facet_wrap(~val_state2)
 
@@ -137,6 +137,7 @@ dot_vio_met
 
 ggsave(dot_vio_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_met.pdf")
 ```
+
 Relational
 
 ```{r}

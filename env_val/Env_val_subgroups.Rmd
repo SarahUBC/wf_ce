@@ -1,0 +1,189 @@
+---
+title: "Env_Val_subgroups"
+author: "Sarah Klain"
+date: "October 26, 2015"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Setup
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+library(wesanderson)
+library(viridis)
+suppressMessages(library(dplyr))
+library(knitr)
+library(tidyr)
+library(broom)
+```
+
+## Constructed Means
+
+Input data
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/env_val")
+d <- read.csv("EnVal_subgroups_10_26_2015.csv")
+```
+
+```{r}
+d_long <- tidyr::gather(d, "val_state", "resp", 3:38)
+
+#d_long$resp2 <- factor(d_long$val_state, levels=c("abuse_nep","bal_r_nep", "crisis_r_nep", "spaceship_nep", "bau_nep", "extract_r_ins", "clean_inst", "loss_r_ins", "comm_rel", "iden_rel", "kin_rel","resp_rel","wild_rel", "health_r_rel", "other_rel", "tech_r",  "decade_r_mor","right_r_mor",  "kin_met", "resp_met", "iden_met", "other_met", "mean_nep", "mean_rel", "mean_met", "mean_inst", "mean_mor"))
+```
+
+Relational across groups
+
+```{r}
+dlt <- d_long %>% 
+  tbl_df
+
+rel <- dlt %>% 
+  filter(val_state == "comm_rel" | val_state == "iden_rel" | val_state == "kin_rel" | val_state == "wild_rel" | val_state == "health_rel2" | val_state == "other_rel")
+
+bar_rel <- ggplot(rel, aes(x = Sub_pop, y= resp, fill = Sub_pop)) +
+  geom_boxplot() +
+  scale_fill_viridis(discrete=TRUE, "") +
+  xlab("Response\n1 = strongly disagree\n3 = neither agree nor disagree\n5 = strongly agree") +
+  ggtitle("Relational: To what extent do you agree with these statements?") +
+  facet_wrap(~val_state) +
+  coord_cartesian(ylim = c(1, 5)) 
+
+bar_rel
+
+ggsave(bar_rel, file="/Users/sarahklain/Documents/R_2015/wf_ce/env_val/plots/bar_rel.pdf")
+```
+
+Relational Violin
+
+```{r}
+vio_rel <- ggplot(rel, aes(x = Sub_pop, y= resp, fill = Sub_pop)) +
+  geom_violin() +
+  scale_fill_viridis(discrete=TRUE, "") +
+  xlab("Response\n1 = strongly disagree; 2= disagree\n3 = neither agree nor disagree\n 4 = agree; 5 = strongly agree") +
+  ggtitle("Relational: To what extent do you agree with these statements?") +
+  facet_wrap(~val_state) +
+  coord_cartesian(ylim = c(1, 5)) 
+
+vio_rel
+
+ggsave(vio_rel, file="/Users/sarahklain/Documents/R_2015/wf_ce/env_val/plots/vio_rel.pdf")
+```
+
+```{r}
+jit_rel <- ggplot(rel, aes(x = Sub_pop, y= resp)) +
+  geom_jitter(aes(color = Sub_pop, x = Sub_pop), 
+     position = position_jitter(width = 0.3), alpha = 0.2) +
+  scale_color_viridis(discrete=TRUE, "") +
+  scale_fill_viridis(discrete=TRUE, "") +
+   xlab("Response\n1 = strongly disagree; 2= disagree\n3 = neither agree nor disagree\n 4 = agree; 5 = strongly agree") +
+  ggtitle("Relational: To what extent do you agree with these statements?") +
+  facet_wrap(~val_state) +
+  coord_cartesian(ylim = c(1, 5)) 
+
+jit_rel
+
+ggsave(jit_rel, file="/Users/sarahklain/Documents/R_2015/wf_ce/env_val/plots/jit_rel.pdf")
+```
+
+### Metaphor
+
+Jitter
+
+```{r}
+met <- dlt %>% 
+  filter(val_state == "kin_met" | val_state == "resp_met" | val_state == "iden_met" | val_state == "other_met") %>% 
+  filter(Sub_pop == "farmer" | Sub_pop == "MT")
+
+jit_met <- ggplot(met, aes(x = Sub_pop, y= resp)) +
+  geom_jitter(aes(color = Sub_pop, x = Sub_pop), 
+     position = position_jitter(width = 0.2), alpha = 0.25) +
+  scale_color_viridis(discrete=TRUE, "") +
+  scale_fill_viridis(discrete=TRUE, "") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("Metaphor:\nTo what extent do you agree with these statements?\nI think about the forest/ocean and the animals in it like...") +
+  facet_wrap(~val_state) +
+  coord_cartesian(ylim = c(1, 5)) 
+
+jit_met
+
+ggsave(jit_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/env_val/plots/jit_met.pdf")
+```
+
+Metaphor Violin
+
+```{r}
+met <- dlt %>% 
+  filter(val_state == "kin_met" | val_state == "resp_met" | val_state == "iden_met" | val_state == "other_met") %>% 
+  filter(Sub_pop == "farmer" | Sub_pop == "MT")
+
+vio_met <- ggplot(met, aes(x = Sub_pop, y = resp)) +
+  geom_violin(aes(fill = Sub_pop)) +
+  #scale_color_viridis(discrete=TRUE, "") +
+  scale_fill_viridis(discrete=TRUE, "") +
+  xlab("Response\n1 = No, this is very unlike how I think about the ocean;\n5 = Yes, this is very much like how I think about the ocean") +
+  ggtitle("Metaphor:\nTo what extent do you agree with these statements?\nI think about the forest/ocean and the animals in it like...") +
+  facet_wrap(~val_state) +
+  coord_cartesian(ylim = c(1, 5)) 
+
+vio_met
+
+ggsave(vio_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/env_val/plots/vio_met.pdf")
+```
+Contructed metrics from means
+
+```{r}
+cm <- dlt %>%
+  filter(val_state == "mean_nep" | val_state == "mean_rel" | val_state == "mean_inst" | val_state == "mean_mor" | val_state == "mean_met" )
+
+jit_met <- ggplot(cm, aes(x = Sub_pop, y= resp)) +
+   geom_jitter(aes(color = Sub_pop, x = Sub_pop), 
+     position = position_jitter(width = 0.35), alpha = 0.25) +
+  scale_color_viridis(discrete=TRUE, "") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") +
+  coord_cartesian(ylim = c(1, 5)) +
+  facet_wrap(~val_state)
+
+jit_met
+
+ggsave(jit_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/jit_met.pdf")
+```
+
+```{r}
+cm <- dlt %>%
+  filter(val_state == "mean_nep" | val_state == "mean_rel" | val_state == "mean_inst" | val_state == "mean_mor" | val_state == "mean_met" )
+
+vio_cm <- ggplot(cm, aes(x = Sub_pop, y= resp)) +
+  geom_violin(aes(color = Sub_pop, x = Sub_pop), width = 0.35, alpha = 0.25) +
+  scale_color_viridis(discrete=TRUE, "") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") +
+  coord_cartesian(ylim = c(1, 5)) +
+  facet_wrap(~val_state)
+
+vio_cm
+
+ggsave(vio_cm, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/vio_cm.pdf")
+```
+
+```{r}
+cm <- dlt %>%
+  filter(val_state == "mean_nep" | val_state == "mean_rel" | val_state == "mean_inst" | val_state == "mean_mor" | val_state == "mean_met" )
+
+bp_cm <- ggplot(cm, aes(x = Sub_pop, y= resp)) +
+  geom_boxplot(aes(color = Sub_pop, x = Sub_pop), width = 0.35, alpha = 0.25) +
+  scale_color_viridis(discrete=TRUE, "") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("Constructed metrics:\nmean responses to statements grouped by theme") +
+  coord_cartesian(ylim = c(1, 5)) +
+  facet_wrap(~val_state)
+
+bp_cm
+
+ggsave(bp_cm, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/bp_cm.pdf")
+```
