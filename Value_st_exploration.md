@@ -267,7 +267,8 @@ ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf"
 ```
 dot plot 
 
-#```{r}
+
+```r
  all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = response, color = Sub_pop)) +
  geom_jitter(alpha = 0.01) +
  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -279,9 +280,26 @@ dot plot
   coord_cartesian(ylim = c(1, 5)) 
 
 all_val_st_dot
+```
 
+```
+## Warning: Removed 7436 rows containing missing values (geom_point).
+```
+
+![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
+
+```r
 ggsave(all_val_st_dot, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/all_val_st_dot.pdf")
- 
+```
+
+```
+## Saving 7 x 5 in image
+```
+
+```
+## Warning: Removed 7436 rows containing missing values (geom_point).
+```
+
 Constructed scores (means by aggregated categories)
  
 
@@ -299,7 +317,7 @@ means_hist <- ggplot(c_MT_means, aes(x = response, fill = val_state)) +
 means_hist
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-13-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
 
 ```r
 ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_hist.pdf")
@@ -325,7 +343,7 @@ mean_val_st_box
 ## Warning: Removed 1206 rows containing non-finite values (stat_boxplot).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-14-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
 
 ```r
 ggsave(mean_val_st_box, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mean_val_st_box.pdf") 
@@ -389,7 +407,7 @@ box_dot_means
 ## Warning: Removed 4 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-15-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
 
 ```r
 ggsave(box_dot_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/box_dot_means.pdf") 
@@ -468,7 +486,7 @@ dot_vio_means
 ## Warning: Removed 1206 rows containing missing values (geom_point).
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-16-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-17-1.png) 
 
 ```r
 ggsave(dot_vio_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_means.pdf")
@@ -557,15 +575,34 @@ coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 ```r
 out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
 library(knitr)
-kable(summary(out)$coef, digits=3)
+kable(summary(out)$coef, digits=3, format = "markdown")
 ```
 
-                Estimate   Std. Error   t value   Pr(>|t|)
--------------  ---------  -----------  --------  ---------
-(Intercept)        1.110        0.195     5.703          0
-cMT$mean_rel       0.723        0.049    14.823          0
 
-cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+
+|             | Estimate| Std. Error| t value| Pr(>&#124;t&#124;)|
+|:------------|--------:|----------:|-------:|------------------:|
+|(Intercept)  |    1.110|      0.195|   5.703|                  0|
+|cMT$mean_rel |    0.723|      0.049|  14.823|                  0|
+
+
+```r
+neprel.table <- cbind(summary(out)$coef)
+knitr::kable(neprel.table, align = 'c', format = 'markdown', digits = 4)
+```
+
+
+
+|             | Estimate | Std. Error | t value | Pr(>&#124;t&#124;) |
+|:------------|:--------:|:----------:|:-------:|:------------------:|
+|(Intercept)  |  1.1098  |   0.1946   | 5.7027  |         0          |
+|cMT$mean_rel |  0.7231  |   0.0488   | 14.8232 |         0          |
+
+```r
+#cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+```
+
+
 
 
 ```r
@@ -580,7 +617,7 @@ nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
 nep_rel_pt 
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-18-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-20-1.png) 
 
 ```r
 ggsave(nep_rel_pt, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/nep_rel_pt.pdf")
@@ -596,7 +633,6 @@ Instrumental and moral
 ```r
 #cval$mean_mor_num <- as.numeric(cval$mean_mor)
 #cval$mean_inst_num <- as.numeric(cval$mean_inst)
-
 
 lm_inst_mor <- lm(cMT$mean_inst ~ cMT$mean_mor)
 summary(lm_inst_mor)
@@ -640,7 +676,7 @@ ggplot(cMT, aes(x = mean_mor, y = mean_inst)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-19-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-21-1.png) 
 
 
 ```r
@@ -758,4 +794,4 @@ ggplot(cMT, aes(x = mean_met, y = mean_rel)) +
   theme_few()
 ```
 
-![](Value_st_exploration_files/figure-html/unnamed-chunk-22-1.png) 
+![](Value_st_exploration_files/figure-html/unnamed-chunk-24-1.png) 

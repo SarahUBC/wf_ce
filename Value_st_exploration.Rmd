@@ -188,7 +188,7 @@ ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf"
 ```
 dot plot 
 
-#```{r}
+```{r}
  all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = response, color = Sub_pop)) +
  geom_jitter(alpha = 0.01) +
  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -202,7 +202,8 @@ dot plot
 all_val_st_dot
 
 ggsave(all_val_st_dot, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/all_val_st_dot.pdf")
- 
+```
+
 Constructed scores (means by aggregated categories)
  
 ```{r}
@@ -294,12 +295,20 @@ coef(lm(cMT$mean_nep ~ cMT$mean_rel))
 ```
 
 ```{r kable}
+
 out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
 library(knitr)
-kable(summary(out)$coef, digits=3)
+kable(summary(out)$coef, digits=3, format = "markdown")
 ```
 
-cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+```{r}
+neprel.table <- cbind(summary(out)$coef)
+knitr::kable(neprel.table, align = 'c', format = 'markdown', digits = 4)
+
+#cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+```
+
+
 
 ```{r}
 nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
@@ -320,7 +329,6 @@ Instrumental and moral
 ```{r}
 #cval$mean_mor_num <- as.numeric(cval$mean_mor)
 #cval$mean_inst_num <- as.numeric(cval$mean_inst)
-
 
 lm_inst_mor <- lm(cMT$mean_inst ~ cMT$mean_mor)
 summary(lm_inst_mor)
