@@ -277,12 +277,15 @@ summary(wf_clogit)</code></pre>
 ## Likelihood ratio test= 2994  on 10 df,   p=0
 ## Wald test            = 1615  on 10 df,   p=0
 ## Score (logrank) test = 2784  on 10 df,   p=0</code></pre>
-<p>I adapted this code below from Puget Sound riparian buffer study. This includes demographic variables.</p>
+<p>I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables.</p>
 <p>escont &lt;- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+ sqinc+sqedu+sqact+sqtrips+ strata(STR), data=cedset, weights=WT)</p>
 </div>
-<div id="next-step-add-demographic-and-attitude-variables-from-my-wf-survey" class="section level3">
-<h3>Next step: add demographic and attitude variables from my WF survey</h3>
-<p>Do I convert all or some to dummy variables?</p>
+<div id="next-steps" class="section level3">
+<h3>Next steps</h3>
+<ol style="list-style-type: decimal">
+<li><p>Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)</p></li>
+<li><p>Add demographic and attitude variables from my WF survey Do I convert all or some to dummy variables?</p></li>
+</ol>
 </div>
 </div>
 

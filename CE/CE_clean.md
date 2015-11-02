@@ -323,14 +323,16 @@ summary(wf_clogit)
 ## Score (logrank) test = 2784  on 10 df,   p=0
 ```
 
-I adapted this code below from Puget Sound riparian buffer study. This includes demographic variables. 
+I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables. 
 
 escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
                     sqinc+sqedu+sqact+sqtrips+
                     strata(STR), data=cedset, weights=WT)
                     
-### Next step: add demographic and attitude variables from my WF survey
+### Next steps
+1. Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)
+
+2. Add demographic and attitude variables from my WF survey
 Do I convert all or some to dummy variables?
-                    
 
 
