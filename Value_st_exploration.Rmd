@@ -21,6 +21,7 @@ suppressMessages(library(dplyr))
 library(knitr)
 library(tidyr)
 library(broom)
+library(stargazer)
 ```
 
 ## Constructed Means
@@ -113,7 +114,7 @@ c_MT_vs_met <- c_MT %>%
 met_bar <- ggplot(c_MT_vs_met, aes(x = response_f, fill = response_f)) +
   geom_histogram() +
   scale_fill_viridis(discrete=TRUE, "Response") +
-  xlab("Response\n1=Yes, this is very much like how I think about the ocean;\n5=No, this is very unlike how I think about the ocean") +
+  xlab("Response\n1 = No, this is very unlike how I think about the ocean;\n5 = Yes, this is very much like how I think about the ocean") +
   ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
   facet_wrap(~val_state)
 
@@ -357,7 +358,9 @@ coef(lm_inst_mor)
 lm_met_rel <- lm(cMT$mean_met ~ cMT$mean_rel)
 summary(lm_met_rel)
 coef(lm_met_rel)
+library(stargazer)
 
+stargazer(lm_met_rel, type = "text", out = "lm_met_rel.txt")
 ggplot(cMT, aes(x = mean_met, y = mean_rel)) +
   geom_point(alpha = 0.25, color = "#330033") +
   geom_abline(intercept = 7.065353, slope = -1.262829, color = "#CC0000") +

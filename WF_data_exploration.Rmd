@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Wind Farm Data Cleaning and Exploration
+### Demographics
 
 ### Data Cleaning
 I deleted the following columns from my data files.
@@ -27,7 +28,6 @@ I deleted the responses that incorrectly asnwered my "are you paying attnetion q
 ```{r}
 library(ggplot2)
 library(ggthemes)
-library(wesanderson)
 library(viridis)
 suppressMessages(library(dplyr))
 library(knitr)
@@ -63,9 +63,10 @@ ggsave(inc, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_demographic/inco
 ```
 
 Education
+Change 
 
 ```{r}
-nc$education2 <- factor(nc$education, levels=c("Grade school", "Some high school","High school graduate", "Some college credit ", "Associate degree", "Bechelor degree", "Graduate degree or Professional degree ", "Professional degree"))
+nc$education2 <- factor(nc$education, levels=c("Grade school", "Some high school","High school graduate", "Some college credit ", "Associate degree", "Bachelor's degree", "Graduate degree or Professional degree ", "Professional degree"))
 ed <- ggplot(data = nc, aes(x= education2, fill = gender))
 edu <- ed + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Education") + ylab("Count") +
