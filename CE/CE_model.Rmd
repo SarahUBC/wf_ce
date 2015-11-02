@@ -142,11 +142,17 @@ make.dataset(respondent.dataset, design.matrix,
 desmat4 <- read.csv("desmat4.csv")
 
 head(desmat4)
-ds <- make.dataset(respondent.dataset = cer, design.matrix = desmat4, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
+ds <- make.dataset(respondent.dataset = cer, design.matrix = desmat_lma, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
 
 ds
+
+ds2 <- make.dataset(respondent.dataset = cer, design.matrix = desmat4, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
+
+ds2
 ```
 
+
+Examples
 ```{r}
 d.pork <- Lma.design(
   attribute.names = list(
@@ -204,6 +210,46 @@ dataset2 <- make.dataset(
 
 head(dataset2)
 dim(dataset2)
+```
+LMA 
+
+```{r}
+
+###
+des3 <- Lma.design(
+ attribute.names = list(
+  Region = c("Reg_A", "Reg_B", "Reg_C"),
+  Eco = c("Conv.", "More", "Most"),
+  Price = c("1", "1.1", "1.2")),
+ nalternatives = 1,
+ nblocks = 1,
+ row.renames = FALSE,
+ seed = 987)
+des3
+questionnaire(choice.experiment.design = des3, quote = FALSE)
+desmat3 <- make.design.matrix(
+ choice.experiment.design = des3,
+ optout = TRUE,
+ categorical.attributes = c("Region", "Eco"),
+ continuous.attributes = c("Price"),
+ unlabeled = TRUE,
+ common = NULL,
+ binary = TRUE)
+data(syn.res3)
+dataset3 <- make.dataset(
+ respondent.dataset = syn.res3,
+ choice.indicators =
+  c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"),
+ design.matrix = desmat3)
+blout <- glm(RES ~ Reg_B + Reg_C + More + Most + Price,
+ family = binomial(link = logit), data = dataset3)
+summary(blout)
+gofm(blout)
+mwtp(output = blout,
+ monetary.variables = c("Price"),
+ nonmonetary.variables =
+  c("Reg_B", "Reg_C", "More", "Most"),
+ seed = 987)
 ```
 
 

@@ -1,0 +1,184 @@
+---
+title: "CE Attempt 2"
+author: "Sarah Klain"
+date: "November 2, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE")
+
+#install.packages("support.CEs")
+library(ggplot2)
+library(ggthemes)
+library(viridis)
+suppressMessages(library(dplyr))
+library(knitr)
+library(tidyr)
+library(broom)
+library(support.CEs)
+library(survival)
+library(mlogit)
+```
+Example #3 from support.CEs.pdf
+
+## LMA design description from support.CEs.pdf
+
+The L^MA method directly creates a choice experiment design from an orthogonal main-effect array (Johnson et al. 2007). In this method, an orthogonal main-effect array with M times A columns of L level factors is used to create each choice set that contains M alternatives of A attributes with L levels. Each row of the array corresponds to the alternatives of a choice set.
+
+This method creates a labeled type choice experiment design that can contain both generic attributes and alternative-specific attributes: the generic attribute refers to that which is included in all the al- ternatives; the alternative-specific attribute is that which is included in only one alternative. The reader is referred to chapters 3 and 5 of Louviere et al. (2000) for details about the types of attribute—generic or alternative-specific—and the types of choice experiment design—labeled or unlabeled.
+
+When this function is used, the combination of attributes and attribute levels, the number of alter- natives per choice set excluding an opt-out or common base option, and the number of blocks are respectively assigned to the arguments.
+
+The combination of attributes and attribute levels are assigned to the argument attribute.names in list format. For example, let’s assume that the alternative has three attributes, each of which has three levels: an attribute X with the three levels of x1, x2, and x3; an attribute Y with the three levels of y1, y2, and y3; and an attribute Z with the three levels of 10, 20, and 30. In this case, the argument is set as follows:
+
+attribute.names = list(X = c("x1", "x2", "x3"),
+Y = c("y1", "y2", "y3"), Z = c("10", "20", "30"))
+
+The number of alternatives per choice set is defined by the argument nalternatives: the number of alternatives does not include an opt-out option such as a "none of these" or a common base option.
+
+Example 3 from support.CEs.pdf
+
+des3 <- Lma.design(
+ attribute.names = list(
+  Region = c("Reg_A", "Reg_B", "Reg_C"),
+  Eco = c("Conv.", "More", "Most"),
+  Price = c("1", "1.1", "1.2")),
+ nalternatives = 1,
+ nblocks = 1,
+ row.renames = FALSE,
+ seed = 987)
+des3
+
+questionnaire(choice.experiment.design = des3, quote = FALSE)
+
+desmat3 <- make.design.matrix(
+ choice.experiment.design = des3,
+ optout = TRUE,
+ categorical.attributes = c("Region", "Eco"),
+ continuous.attributes = c("Price"),
+ unlabeled = TRUE,
+ common = NULL,
+ binary = TRUE)
+data(syn.res3)
+
+dataset3 <- make.dataset(
+ respondent.dataset = syn.res3,
+ choice.indicators =
+  c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"),
+ design.matrix = desmat3)
+
+blout <- glm(RES ~ Reg_B + Reg_C + More + Most + Price,
+             family = binomial(link = logit), data = dataset3)
+summary(blout)
+
+gofm(blout)
+
+mwtp(output = blout,
+ monetary.variables = c("Price"),
+ nonmonetary.variables =
+  c("Reg_B", "Reg_C", "More", "Most"),
+ seed = 987)
+
+### lma design
+
+```{r}
+lma_des_wf <- Lma.design(
+     attribute.names = list(
+       hab_qual = c("big loss", "small loss", "small gain", "big gain"), 
+       own = c("state", "municipal", "private", "cooperative"),
+       vis = c("mi1", "mi4", "mi8", "mi10"), bill = c("1", "5", "10", "20")), 
+       nalternatives = 2,
+       nblocks = 4, 
+       row.renames = FALSE,
+       seed = 987)
+
+#lma_des_wf
+```
+
+### Create (and understand!) format of design matrix
+
+```{r}
+desmat_lma <-make.design.matrix(
+  choice.experiment.design = lma_des_wf,
+  optout = TRUE,
+  categorical.attributes = c("hab_qual", "own", "vis"), 
+  continuous.attributes = c("bill"),
+  unlabeled = TRUE)
+
+head(desmat_lma)
+
+#save as csv in case I want to look at it outside of R
+
+write.csv(desmat_lma, "desmat_lma.csv")
+# If you modify the csv file, then read it back into R, be sure to remove the first column numbered 1,2,3 etc. that is automatically added when a table is written to csv. 
+```
+
+Manually match my JMP CE configuration to the format of the design matrix that R outputed (desmat_lma). I did this in excel and saved it as a csv. 
+
+wf means wind farm choice experiment data
+
+```{r}
+
+desmat_lma_wf <- read.csv("desmat_lma_wf.csv")
+
+```
+
+Load my respondent dataset
+
+```{r}
+# data only on the 8 choice experiment choices
+cer <- read.csv("cer_2015_10_23_min.csv")
+
+# data with data on 8 choices and demographic and attitude data
+cer_big <- read.csv("cer_2015_10_23.csv")
+
+str(cer)
+```
+
+Makes a data set using make.dataset. This will be used for a conditional logit model analysis with the function clogit in the package survival or for a binary choice model analysis with the function glm in the package stats.
+
+The code is copied from support.CEs.pdf, which has an example with 9 questions in the CE:
+
+make.dataset(respondent.dataset, design.matrix,
+                 choice.indicators, detail = FALSE)
+
+ choice.indicators = 
+  c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"), 
+ design.matrix = desmat2)
+ 
+```{r}
+dswf <- make.dataset(respondent.dataset = cer, design.matrix = desmat_lma_wf, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
+
+head(dswf)
+```
+
+### Run conditional logistic regression
+
+```{r}
+wf_clogit <- clogit(RES ~ +small.loss + small.gain + big.gain + 
+                      municipal + private + cooperative + 
+                      mi4 + mi8 + mi10 + bill + 
+                      strata(STR), data=dswf)
+summary(wf_clogit)
+
+```
+
+I adapted this code below from Puget Sound riparian buffer study. This includes demographic variables. 
+
+escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
+                    sqinc+sqedu+sqact+sqtrips+
+                    strata(STR), data=cedset, weights=WT)
+                    
+### Next step: add demographic and attitude variables from my WF survey
+Do I convert all or some to dummy variables?
+                    
+
+
