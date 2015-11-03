@@ -45,12 +45,14 @@ ar
 
 ns <- ggplot(ar, aes(x = Opinion, y = Response, fill = Opinion))+
   geom_bar(stat = "identity") +
-  scale_fill_viridis(discrete=TRUE, "Opinion") +
+  scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   xlab("Opinion") + ylab("Response (%)") +
-  ggtitle("Do you think that making electricty from wind\nis a good idea, a bad idea, or neither good nor bad?")
+  ggtitle("Do you think that making electricty\nfrom wind is a good idea, a bad idea,\nor neither good nor bad?")
 
 ns
+
+ggsave(ns, file = "natl_sur_Krosnick.pdf")
 ```
 
 support by Political party 
@@ -65,12 +67,12 @@ nc$pol_party2 <- factor(nc$pol_party, levels = c("Republican party", "Democratic
 #myColors <- brewer.pal(5,"Set1")
 #myColors
 
-myColors2 <- c("brown3", "blue3", "goldenrod", "darkgreen", "darkorchid4")
+myColors2 <- c("brown3", "blue3", "gold2", "forestgreen", "darkorchid4")
 
 #names(myColors) <- levels(nc$pol_party)
 #colFill <- scale_fill_manual(name = "grp",values = myColors)
 
-colFill2 <- scale_fill_manual(values = myColors2)
+colFill2 <- scale_fill_manual(values = myColors2, "")
 
 p <- ggplot(dat,aes(x,y,colour = grp)) + geom_point()
 p1 <- p + colFill
@@ -82,6 +84,8 @@ attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party2)) +
   ggtitle("What is your attitude toward developing\nwind power in the US?")
   
 attUS
+
+ggsave(attUS, file = "attUS.pdf")
 ```
 
 Ashlee's code for specifying color in stacked bar chart. 

@@ -168,6 +168,7 @@ wf_clogit <- clogit(RES ~ +small.loss + small.gain + big.gain +
                       mi4 + mi8 + mi10 + bill + 
                       strata(STR), data=dswf)
 summary(wf_clogit)
+wf_clogit
 
 ```
 
@@ -176,9 +177,24 @@ I adapted this code below from Puget Sound riparian buffer study. The model belo
 escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
                     sqinc+sqedu+sqact+sqtrips+
                     strata(STR), data=cedset, weights=WT)
+            
                     
 ### Next steps
 1. Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)
+```{r}
+# rescont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
+                  #  sqinc+sqedu+sqact+sqtrips+
+                   # strata(STR), data=cedset, weights=WT)
+# summary(rescont)
+wtpwf <- mwtp(wf_clogit, monetary.variables=c("bill"), 
+              nonmonetary.variables=c("small.loss",  "small.gain", "big.gain", 
+                                      "municipal","private", "cooperative", 
+                                      "mi4", "mi8", "mi10"), nreplications=1000)
+wtpwf
+
+#gofcont <- gofm(wtpwf)
+#gofcont
+```
 
 2. Add demographic and attitude variables from my WF survey
 Do I convert all or some to dummy variables?
