@@ -173,11 +173,19 @@ In your opinion, construction of offshore wind turbines off the coast of your st
 ```{r}
 nc$const_st2 <- factor(nc$const_st, levels=c("Encouraged", "Tolerated", "Discouraged", "Prohibited", "Not sure"))
 
-constst <- ggplot(nc, aes(x = const_st2, fill = const_st2)) +
-  geom_histogram(binwidth = 3) +
+nct <- nc %>% 
+  tbl_df
+  
+nct2 <- nct %>% 
+  filter(const_st2 != "NA")
+
+constst <- ggplot(nct2, aes(x = const_st2, fill = const_st2)) +
+  #geom_histogram(binwidth = 3) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("Response") + ylab("Count") +
+  xlab("Opinion") + ylab("Response") +
+  scale_y_continuous(labels=percent) +
   ggtitle("In your opinion, construction of offshore\nwind turbines off the coast of your state should be:")
 
 constst
@@ -189,12 +197,15 @@ ggsave(constst, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/const
 Would the presence of a visible offshore wind farm make you more or less likely to go to the coast for recreational purposes (e.g., beach-going, boating, fishing, or walking along the coast)?
 
 ```{r}
-nc$wf_rec2 <- factor(nc$wf_rec, levels=c("Much less likely","Less likely", "No difference", "More likely", "Much more likely"))
+summary(nc$wf_rec)
+nc$wf_rec2 <- factor(nc$wf_rec, levels=c("Much less likely","Less likely    ", "No difference", "More likely", "Much more likely"))
 
 wfrec <- ggplot(nc, aes(x = wf_rec2)) +
-  geom_histogram(binwidth = 3, fill = "blue4") +
+   geom_bar(fill = "blue4", binwidth = 3, aes(y = (..count..)/sum(..count..))) + 
+  #geom_histogram(binwidth = 3, fill = "blue4") +
+  scale_y_continuous(labels = percent) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("Response") + ylab("Count") +
+  xlab("") + ylab("Response") +
   ggtitle("Would the presence of a visible offshore wind farm make you\nmore or less likely to go to the coast for recreational purposes, \ne.g., beach-going, boating, fishing, or walking along the coast?")
   
 wfrec
@@ -204,13 +215,16 @@ ggsave(wfrec, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs_wf_att/wfrec.p
 Imagine that a wind project off your state’s coast was the first of numerous North American offshore wind projects. Would this influence your attitude towards the wind project? For example, suppose that building 200 offshore wind farms could supply 30% of the electricity for New England coastal states. Together, these wind farms would have a substantially larger impact on how people currently use the ocean and the ocean environment than one wind farm. However, 200 wind farms could reduce air pollution and reliance on fossil fuels linked to climate change and sea level rise. If you knew that the farm near your state’s coast was the first of many offshore wind farms, would you be more or less likely to support the wind farm?
 
 ```{r}
+library("scales")
 nc$first_m2 <- factor(nc$first_of_many, levels=c("Much less likely to support", "Less likely to support", "No effect on my attitude", "More likely to support", "Much more likely to support"))
 
 First_st <- ggplot(nc, aes(x = first_m2)) +
-  geom_histogram(binwidth = 3, fill = "blue4") +
+  geom_bar(fill = "blue4", binwidth = 3, aes(y = (..count..)/sum(..count..) )) + 
+  #geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("Response") + ylab("Count") +
-  ggtitle("If you knew that the farm near the coast of your state\nwas the first of many offshore wind farms, would you be\nmore or less likely to support the wind farm?")
+  xlab("") + ylab("Response") +
+  scale_y_continuous(labels=percent) +
+  ggtitle("If you knew that the farm near the coast of your state\nwas the first of many offshore wind farms, would you\nbe more or less likely to support the wind farm?")
   
 First_st
 

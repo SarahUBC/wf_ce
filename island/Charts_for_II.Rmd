@@ -19,6 +19,7 @@ suppressMessages(library(dplyr))
 library(knitr)
 library(tidyr)
 library("RColorBrewer")
+library("scales")
 ```
 
 ```{r}
@@ -28,6 +29,7 @@ nw <- read.csv("nat_sur_wind.csv")
 ```
 
 ```{r}
+nw$response2 <-  nw$Response/410
 
 nwt <- nw %>% 
   tbl_df
@@ -44,9 +46,10 @@ ar <-  nwt %>% mutate(Opinion = reorder(Opinion, desc(Response))) %>%
 ar
 
 ns <- ggplot(ar, aes(x = Opinion, y = Response, fill = Opinion))+
-  geom_bar(stat = "identity") +
+  geom_bar(stat ="identity") + 
   scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  #scale_y_continuous(labels=percent) +
   xlab("Opinion") + ylab("Response (%)") +
   ggtitle("Do you think that making electricty\nfrom wind is a good idea, a bad idea,\nor neither good nor bad?")
 
@@ -74,16 +77,17 @@ myColors2 <- c("brown3", "blue3", "gold2", "forestgreen", "darkorchid4")
 
 colFill2 <- scale_fill_manual(values = myColors2, "")
 
-p <- ggplot(dat,aes(x,y,colour = grp)) + geom_point()
-p1 <- p + colFill
+#p <- ggplot(dat,aes(x,y,colour = grp)) + geom_point()
+#p1 <- p + colFill
 
-attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party2)) +
-  geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("Attitude") + ylab("Count") + 
-  colFill2 + 
-  ggtitle("What is your attitude toward developing\nwind power in the US?")
-  
-attUS
+  attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party2)) +
+    geom_bar(aes(y = (..count..)/sum(..count..))) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    xlab("Attitude") + ylab("Response") + 
+    colFill2 + 
+    scale_y_continuous(labels=percent) +
+    ggtitle("What is your attitude toward developing\nwind power in the US?")
+    
+  attUS
 
 ggsave(attUS, file = "attUS.pdf")
 ```

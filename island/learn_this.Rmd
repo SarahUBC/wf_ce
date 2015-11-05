@@ -1,0 +1,10 @@
+---
+title: "Learn this"
+author: "Sarah Klain"
+date: "November 3, 2015"
+output: html_document
+---
+```{r}
+nlevels
+```
+
