@@ -172,20 +172,9 @@ wf_clogit
 
 ```
 
-I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables. 
+### Estimate WTP
 
-escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
-                    sqinc+sqedu+sqact+sqtrips+
-                    strata(STR), data=cedset, weights=WT)
-            
-                    
-### Next steps
-1. Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)
 ```{r}
-# rescont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
-                  #  sqinc+sqedu+sqact+sqtrips+
-                   # strata(STR), data=cedset, weights=WT)
-# summary(rescont)
 wtpwf <- mwtp(wf_clogit, monetary.variables=c("bill"), 
               nonmonetary.variables=c("small.loss",  "small.gain", "big.gain", 
                                       "municipal","private", "cooperative", 
@@ -196,7 +185,27 @@ wtpwf
 #gofcont
 ```
 
-2. Add demographic and attitude variables from my WF survey
-Do I convert all or some to dummy variables?
+### Next Steps
+* Clogit removes first attributes (big.loss, state, mi1). Figure out how to make opt out choice C the base level to find estimates for four levels of those three attributes.
+* Add demographic and attitude variables from my WF survey. Do I convert all or some to dummy variables?
+
+
+
+
+
+
+### Misc Notes
+A friend's code that I used to understand my model. I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables. 
+
+escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
+                    sqinc+sqedu+sqact+sqtrips+
+                    strata(STR), data=cedset, weights=WT)
+
+rescont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
+                  #  sqinc+sqedu+sqact+sqtrips+
+                   # strata(STR), data=cedset, weights=WT)
+summary(rescont)
+
+
 
 

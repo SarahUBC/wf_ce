@@ -299,19 +299,10 @@ summary(wf_clogit)</code></pre>
 ## Likelihood ratio test=2994  on 10 df, p=0
 ## n= 9594, number of events= 3198 
 ##    (6 observations deleted due to missingness)</code></pre>
-<p>I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables.</p>
-<p>escont &lt;- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+ sqinc+sqedu+sqact+sqtrips+ strata(STR), data=cedset, weights=WT)</p>
 </div>
-<div id="next-steps" class="section level3">
-<h3>Next steps</h3>
-<ol style="list-style-type: decimal">
-<li>Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)</li>
-</ol>
-<pre class="r"><code># rescont &lt;- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
-                  #  sqinc+sqedu+sqact+sqtrips+
-                   # strata(STR), data=cedset, weights=WT)
-# summary(rescont)
-wtpwf &lt;- mwtp(wf_clogit, monetary.variables=c(&quot;bill&quot;), 
+<div id="estimate-wtp" class="section level3">
+<h3>Estimate WTP</h3>
+<pre class="r"><code>wtpwf &lt;- mwtp(wf_clogit, monetary.variables=c(&quot;bill&quot;), 
               nonmonetary.variables=c(&quot;small.loss&quot;,  &quot;small.gain&quot;, &quot;big.gain&quot;, 
                                       &quot;municipal&quot;,&quot;private&quot;, &quot;cooperative&quot;, 
                                       &quot;mi4&quot;, &quot;mi8&quot;, &quot;mi10&quot;), nreplications=1000)
@@ -331,9 +322,19 @@ wtpwf</code></pre>
 ## method = Krinsky and Robb</code></pre>
 <pre class="r"><code>#gofcont &lt;- gofm(wtpwf)
 #gofcont</code></pre>
-<ol start="2" style="list-style-type: decimal">
-<li>Add demographic and attitude variables from my WF survey Do I convert all or some to dummy variables?</li>
-</ol>
+</div>
+<div id="next-steps" class="section level3">
+<h3>Next Steps</h3>
+<ul>
+<li>Clogit removes first attributes (big.loss, state, mi1). Figure out how to make opt out choice C the base level to find estimates for four levels of those three attributes.</li>
+<li>Add demographic and attitude variables from my WF survey. Do I convert all or some to dummy variables?</li>
+</ul>
+</div>
+<div id="misc-notes" class="section level3">
+<h3>Misc Notes</h3>
+<p>A friend’s code that I used to understand my model. I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables.</p>
+<p>escont &lt;- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+ sqinc+sqedu+sqact+sqtrips+ strata(STR), data=cedset, weights=WT)</p>
+<p>rescont &lt;- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+ # sqinc+sqedu+sqact+sqtrips+ # strata(STR), data=cedset, weights=WT) summary(rescont)</p>
 </div>
 </div>
 
