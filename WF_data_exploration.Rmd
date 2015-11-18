@@ -184,7 +184,7 @@ constst <- ggplot(nct2, aes(x = const_st2, fill = const_st2)) +
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("Opinion") + ylab("Response") +
+  xlab("Opinion") + ylab("Percent of\nRespondents") +
   scale_y_continuous(labels=percent) +
   ggtitle("In your opinion, construction of offshore\nwind turbines off the coast of your state should be:")
 
@@ -205,7 +205,7 @@ wfrec <- ggplot(nc, aes(x = wf_rec2)) +
   #geom_histogram(binwidth = 3, fill = "blue4") +
   scale_y_continuous(labels = percent) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("") + ylab("Response") +
+  xlab("") + ylab("Percent of\nRespondents") +
   ggtitle("Would the presence of a visible offshore wind farm make you\nmore or less likely to go to the coast for recreational purposes, \ne.g., beach-going, boating, fishing, or walking along the coast?")
   
 wfrec
@@ -222,7 +222,7 @@ First_st <- ggplot(nc, aes(x = first_m2)) +
   geom_bar(fill = "blue4", binwidth = 3, aes(y = (..count..)/sum(..count..) )) + 
   #geom_histogram(binwidth = 3, fill = "blue4") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  xlab("") + ylab("Response") +
+  xlab("") + ylab("Percent of\nRespondents") +
   scale_y_continuous(labels=percent) +
   ggtitle("If you knew that the farm near the coast of your state\nwas the first of many offshore wind farms, would you\nbe more or less likely to support the wind farm?")
   

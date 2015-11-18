@@ -50,7 +50,7 @@ ns <- ggplot(ar, aes(x = Opinion, y = Response, fill = Opinion))+
   scale_fill_viridis(discrete=TRUE, "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   #scale_y_continuous(labels=percent) +
-  xlab("Opinion") + ylab("Response (%)") +
+  xlab("Opinion") + ylab("Percent of\nRespondents") +
   ggtitle("Do you think that making electricty\nfrom wind is a good idea, a bad idea,\nor neither good nor bad?")
 
 ns
@@ -82,7 +82,7 @@ colFill2 <- scale_fill_manual(values = myColors2, "")
 
   attUS <- ggplot(data = nc, aes(x= nc$att_w_US2, fill = pol_party2)) +
     geom_bar(aes(y = (..count..)/sum(..count..))) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    xlab("Attitude") + ylab("Response") + 
+    xlab("Attitude") + ylab("Percent of\nRespondents") + 
     colFill2 + 
     scale_y_continuous(labels=percent) +
     ggtitle("What is your attitude toward developing\nwind power in the US?")

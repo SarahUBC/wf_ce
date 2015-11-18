@@ -323,14 +323,76 @@ summary(wf_clogit)
 ## Score (logrank) test = 2784  on 10 df,   p=0
 ```
 
+```r
+wf_clogit
+```
+
+```
+## Call:
+## clogit(RES ~ +small.loss + small.gain + big.gain + municipal + 
+##     private + cooperative + mi4 + mi8 + mi10 + bill + strata(STR), 
+##     data = dswf)
+## 
+## 
+##                 coef exp(coef) se(coef)      z       p
+## small.loss   1.32865   3.77594  0.07499  17.72 < 2e-16
+## small.gain   2.86839  17.60858  0.09228  31.08 < 2e-16
+## big.gain     3.73939  42.07245  0.10760  34.75 < 2e-16
+## municipal   -0.15558   0.85592  0.07676  -2.03  0.0427
+## private     -0.48602   0.61507  0.07907  -6.15 7.9e-10
+## cooperative -0.31534   0.72954  0.10003  -3.15  0.0016
+## mi4          0.21448   1.23921  0.07793   2.75  0.0059
+## mi8          0.34400   1.41057  0.07587   4.53 5.8e-06
+## mi10         0.83958   2.31540  0.10917   7.69 1.5e-14
+## bill        -0.07223   0.93032  0.00543 -13.30 < 2e-16
+## 
+## Likelihood ratio test=2994  on 10 df, p=0
+## n= 9594, number of events= 3198 
+##    (6 observations deleted due to missingness)
+```
+
 I adapted this code below from Puget Sound riparian buffer study. The model below includes demographic variables. 
 
 escont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
                     sqinc+sqedu+sqact+sqtrips+
                     strata(STR), data=cedset, weights=WT)
+            
                     
 ### Next steps
 1. Understand why the first levels of my discreet attributes are dropped when the dataset is made and model is run (e.g., big loss, state owned, 1 mile away)
+
+```r
+# rescont <- clogit(RES~Environmental_Quality+Farm_Conversion+Annual_10Yr_Tax+ascsq+
+                  #  sqinc+sqedu+sqact+sqtrips+
+                   # strata(STR), data=cedset, weights=WT)
+# summary(rescont)
+wtpwf <- mwtp(wf_clogit, monetary.variables=c("bill"), 
+              nonmonetary.variables=c("small.loss",  "small.gain", "big.gain", 
+                                      "municipal","private", "cooperative", 
+                                      "mi4", "mi8", "mi10"), nreplications=1000)
+wtpwf
+```
+
+```
+## 
+##                MWTP    2.5%   97.5%
+## small.loss  18.3949 15.7078 21.6989
+## small.gain  39.7122 35.1280 45.7114
+## big.gain    51.7711 45.5319 59.8823
+## municipal   -2.1540 -4.3475 -0.1974
+## private     -6.7289 -9.4186 -4.5366
+## cooperative -4.3658 -7.1211 -1.5569
+## mi4          2.9694  0.9035  5.3135
+## mi8          4.7625  2.7950  6.9917
+## mi10        11.6239  8.4417 15.0521
+## 
+## method = Krinsky and Robb
+```
+
+```r
+#gofcont <- gofm(wtpwf)
+#gofcont
+```
 
 2. Add demographic and attitude variables from my WF survey
 Do I convert all or some to dummy variables?
