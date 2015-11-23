@@ -385,7 +385,14 @@ wtpwf
 
 ### Next Steps
 * Clogit removes first attributes (big.loss, state, mi1). Figure out how to make opt out choice C the base level to find estimates for four levels of those three attributes.
+* How does support.CEs deal with the four blocks? Runs the model four times then averages the outputs? Does it weight the averages according to how many people took the survey?
+* Use Wald test to determine if JMP outputted inadequate survey designs? How does this relate to the Wald test from the support.CEs code that I ran? 
 * Add demographic and attitude variables from my WF survey. Do I convert all or some to dummy variables?
+* Try multinomial logit (mlogit)? See Train 2009
+  Error must have Gumbel distribution
+* Try Random Parameter Logit Model? This is a type of Mixed Logit Model.
+* Tips on rigorously comparing demographic characteristics of my sample to census data from coastal New England states?
+
 
 
 

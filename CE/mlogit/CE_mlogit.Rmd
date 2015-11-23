@@ -1,0 +1,94 @@
+---
+title: "CE_mlogit"
+author: "Sarah Klain"
+date: "November 20, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE/mlogit")
+
+#install.packages("support.CEs")
+library(ggplot2)
+library(ggthemes)
+library(viridis)
+suppressMessages(library(dplyr))
+library(knitr)
+library(tidyr)
+library(broom)
+#library(support.CEs)
+library(survival)
+library(mlogit)
+library(stargazer)
+```
+
+input data
+gather data (make it long form)
+b1 mean Block 1
+```{r}
+b1 <- read.csv("B1_cer.csv")
+b1_l <- tidyr::gather(b1, "ce_quest", "response", 2:9)
+```
+
+Follow along Viton's work
+```{r}
+#clogit <- read.csv("clogit.csv", na.strings= "-999")
+
+# read in the data
+library(foreign)
+clogit <- read.csv("clogit.csv", col.names=c("mode","ttme","invc","invt","gc","chair","hinc", "psize","indj","indi","aasc","tasc","basc","casc","hinca","psizea","z","nij","ni"),na.strings="-999")
+ 
+# check the data
+summary(clogit)
+str(clogit)
+head(clogit)
+# save a version of the data in internal format
+save(clogit,file="clogit.rdata")
+# read in the mlogit package
+library(mlogit)
+# read in the data we saved
+load(file="clogit.rdata")
+# provide a choice indicator, with names
+clogit$mode.ids<-factor(rep(1:4,210),labels=c("air","train","bus","car"))
+
+# for convenience, create a special form of the dataset: note that we exploit the case sensititivty here: clogit is the original dataset, while CLOGIT (all-caps) is the version for use with the mlogit package.
+
+CLOGIT<-mlogit.data(clogit,shape="long",choice="mode",alt.var="mode.ids")
+
+# first model : standard logit. We save the results into a variable and then view them. The first command uses the un-fixed dataset, while the second uses the mlogit-specific dataset, and is clearly easier to type in. Both produce the same output.
+
+res1<-mlogit(mode~ttme+gc, data=clogit, shape="long",
+                alt.var="mode.ids")
+summary(res1)
+res2<-mlogit(mode~ttme+gc,data=CLOGIT)
+summary(res2)
+
+# model with income interacted with the mode-specific dummys
+res3<-mlogit(mode~ttme+gc | hinc, data=CLOGIT)
+summary(res3)
+
+ # model with gc arying by mode
+res4<-mlogit(mode~ttme | hinc | gc, data=CLOGIT)
+summary(res4)
+
+# mixed logit model  in which the alt-specific vars have independent normal distributions. We use Halton numbers for efficiency in computation, and use R=500 in our simulationsnote that the syntax for specifying random alt-specific dummys has changed.
+# we set print.level to 1 to get some feedback
+
+res5<-mlogit(mode~ttme+gc,data=CLOGIT,reflevel="car",
+      rpar=c("air:(intercept)"="n","bus:(intercept)"="n",
+      "train:(intercept)"="n"),R=500,halton=NA,print.level=1)
+summary(res5)
+
+# print info on what was estimated for a random parameter
+rpar(res5,"air:(intercept)")
+
+# same model, but multinomial probit (not discussed in the text)
+res6<-mlogit(mode~ttme+gc,data=CLOGIT,reflevel="car",
+             R=500,halton=NA,probit=TRUE,print.level=1)
+summary(res6)
+# Omega-sub-i for each mode:
+res6$omega
+```
+

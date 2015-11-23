@@ -1,0 +1,41 @@
+---
+title: "Mapping CE data"
+author: "Sarah Klain"
+date: "November 18, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/mapping")
+
+#install.packages("ggmap)
+library(ggmap)
+#install.packages("support.CEs")
+library(ggplot2)
+library(ggthemes)
+library(viridis)
+suppressMessages(library(dplyr))
+library(knitr)
+library(tidyr)
+library(broom)
+library(support.CEs)
+library(survival)
+library(mlogit)
+```
+## Summarize number of respondents by zip code
+```{r}
+zc <- read.csv("Coded_WF_10_26_2015zipcode.csv")
+zc$zip2 <- as.factor(zc$zip)
+str(zc$zip2)
+
+table(zc$zip2)
+ztbl <- as.data.frame(table(zc$zip2), responseName="nums")
+View(ztbl)
+```
+
