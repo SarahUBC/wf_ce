@@ -92,3 +92,69 @@ summary(res6)
 res6$omega
 ```
 
+Learn from the examples of Croissant (2011).
+```{r}
+library("mlogit")
+data("Train", package = "mlogit")
+head(Train, 3)
+Tr <- mlogit.data(Train, shape = "wide", choice = "choice", varying = 4:11, sep = "", alt.levels = c(1, 2), id = "id")
+head(Tr, 3)
+head(index(Tr), 3)
+
+#change price and time to more meaningful units (euros, hours respectively)
+Tr$price <- Tr$price/100 * 2.20371
+Tr$time <- Tr$time/60
+
+#We then estimate the model: both alternatives being virtual train trips, it is relevant to use only generic coefficients and to remove the intercept:
+
+ml.Train <- mlogit(choice ~ price + time + change + comfort | -1, Tr)
+summary(ml.Train)
+
+#coefficients are not directly interpretable, but dividing them by the price coefficient, we get monetary values :
+coef(ml.Train)[-1]/coef(ml.Train)[1]
+
+#Mixed logit
+Tr <- mlogit.data(Train, shape = "wide", varying = 4:11, choice = "choice", sep = "", opposite = c("price", "time", "change", "comfort"), alt.levels = c("choice1", "choice2"), id = "id")
+
+Train.ml <- mlogit(choice ~ price + time + change + comfort, Tr)
+summary(Train.ml)
+
+Train.mxlc <- mlogit(choice ~ price + time + change + comfort, Tr, panel = TRUE, rpar = c(time = "cn", change = "n", comfort = "ln"), correlation = TRUE, R = 100, halton = NA)
+
+summary(Train.mxlc)
+
+Train.mxlu <- update(Train.mxlc, correlation = FALSE)
+
+
+```
+
+Try with my data
+
+```{r}
+wfml <- read.csv("dswf_ml.csv")
+
+wfml2 <- mlogit.data(wfml, shape = "long", choice = "choice",
+                     varying = 16:28, sep = "",
+                     alt.levels = c(1, 2, 3), 
+                     alt.var = "ALT", id = "id")
+head(wfml2, 3)
+
+ml.wfml <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + private + cooperative +  mi4 + mi8 +
+                    mi10 + bill  | -1, wfml2)
+
+summary(ml.wfml)
+#these outputs are the same as when I used support.CEs package
+```
+
+### Mixed Logit
+
+```{r}
+wf.mxlc <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + private + cooperative +  
+                    mi4 + mi8 + mi10 + bill,
+                  wfml2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+
+summary(wf.mxlc)
+```
+

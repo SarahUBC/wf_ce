@@ -187,12 +187,24 @@ wtpwf
 ```
 
 ```{r}
-wf_mlogit <- mlogit(RES ~ +small.loss + small.gain + big.gain + 
+#testing with mlogit?
+#wf_mlogit <- mlogit(RES ~ +small.loss + small.gain + big.gain + 
+#                      municipal + private + cooperative + 
+#                      mi4 + mi8 + mi10 + bill + 
+#                      strata(STR), data=dswf)
+
+#summary(wf_mlogit)
+#wf_clogit
+#Extract block 1
+
+dswf_t <- tbl_df(dswf) 
+
+dswf_tb1 <- dswf_t %>% 
+  filter(BLOCK == 1)
+
+wf_mlogit <- mlogit(RES ~ small.loss + small.gain + big.gain + 
                       municipal + private + cooperative + 
-                      mi4 + mi8 + mi10 + bill + 
-                      strata(STR), data=dswf)
-summary(wf_mlogit)
-wf_clogit
+                      mi4 + mi8 + mi10 + bill, data = dswf_tb1)
 
 ```
 
