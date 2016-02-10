@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE")
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE/demog")
 
 #install.packages("support.CEs")
 library(ggplot2)
@@ -36,7 +36,7 @@ The L^MA method directly creates a choice experiment design from an orthogonal m
 
 This method creates a labeled type choice experiment design that can contain both generic attributes and alternative-specific attributes: the generic attribute refers to that which is included in all the al- ternatives; the alternative-specific attribute is that which is included in only one alternative. The reader is referred to chapters 3 and 5 of Louviere et al. (2000) for details about the types of attribute—generic or alternative-specific—and the types of choice experiment design—labeled or unlabeled.
 
-When this function is used, the combination of attributes and attribute levels, the number of alter- natives per choice set excluding an opt-out or common base option, and the number of blocks are respectively assigned to the arguments.
+When this function is used, the combination of attributes and attribute levels, the number of alternatives per choice set excluding an opt-out or common base option, and the number of blocks are respectively assigned to the arguments.
 
 The combination of attributes and attribute levels are assigned to the argument attribute.names in list format. For example, let’s assume that the alternative has three attributes, each of which has three levels: an attribute X with the three levels of x1, x2, and x3; an attribute Y with the three levels of y1, y2, and y3; and an attribute Z with the three levels of 10, 20, and 30. In this case, the argument is set as follows:
 
@@ -136,12 +136,17 @@ Load my respondent dataset
 
 ```{r}
 # data only on the 8 choice experiment choices
-cer <- read.csv("cer_2015_10_23_min.csv")
+#no demographic data
+#cer <- read.csv("cer_2015_10_23_min.csv")
+
+# with demographic data
+cer_d <- read.csv("cer_2016_01_08_dem.csv")
 
 # data with data on 8 choices and demographic and attitude data
-cer_big <- read.csv("cer_2015_10_23.csv")
+#cer_big <- read.csv("cer_2015_10_23.csv")
 
-str(cer)
+# str(cer)
+str(cer_d)
 ```
 
 Makes a data set using make.dataset. This will be used for a conditional logit model analysis with the function clogit in the package survival or for a binary choice model analysis with the function glm in the package stats.
@@ -156,9 +161,10 @@ make.dataset(respondent.dataset, design.matrix,
  design.matrix = desmat2)
  
 ```{r}
-dswf <- make.dataset(respondent.dataset = cer, design.matrix = desmat_lma_wf, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
+dswf <- make.dataset(respondent.dataset = cer_d, design.matrix = desmat_lma_wf, choice.indicators = c("q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"), detail = TRUE)
 
 head(dswf)
+# View(dswf)
 ```
 
 ### Run conditional logistic regression
