@@ -24,15 +24,9 @@ library(mlogit)
 library(stargazer)
 ```
 
-input data
-gather data (make it long form)
-b1 mean Block 1
-```{r}
-b1 <- read.csv("B1_cer.csv")
-b1_l <- tidyr::gather(b1, "ce_quest", "response", 2:9)
-```
 
 Follow along Viton's work
+Conditional Logistic Regression
 ```{r}
 #clogit <- read.csv("clogit.csv", na.strings= "-999")
 
@@ -128,8 +122,10 @@ Train.mxlu <- update(Train.mxlc, correlation = FALSE)
 
 ```
 
-Try with my data
 
+
+### Conditional Logit
+Try with my data
 ```{r}
 wfml <- read.csv("dswf_ml.csv")
 
@@ -157,4 +153,57 @@ wf.mxlc <- mlogit(choice ~ small.loss + small.gain + big.gain +
 
 summary(wf.mxlc)
 ```
+Ai
+```{r}
+wf.mxlc2 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + private + cooperative +  
+                    mi4 + mi8 + mi10 + bill,
+                  wfml2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), R = 100)
+
+summary(wf.mxlc2)
+```
+What does panel do?
+
+```{r}
+#takes 10 min to run with no panel
+wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + private + cooperative +  
+                    mi4 + mi8 + mi10 + bill,
+                  wfml2, panel = FALSE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+```
+
+summary(wf.mxlc.np)
+# not correlated
+wf.mxlu <- update(wf.mxlc, correlation = FALSE)
+summary(wf.mxlu)
+```
+
+Translate to dollar values
+Normalize with bill 
+```{r}
+big.gain.value <- rpar(wf.mxlc, "big.gain", norm = "bill")
+summary(big.gain.value)
+med(big.gain.value)
+mean(big.gain.value)
+
+big.gain.value.nc <- rpar(wf.mxlu, "big.gain", norm = "bill")
+summary(big.gain.value.nc)
+med(big.gain.value.nc)
+mean(big.gain.value.nc)
+```
+
+Use AIC to compare models
+
+Interact with demographics 
+e.g., age:mi4
+
+goodness of fit
+lrtest
+AIC
+
+demographics
+test to see if panel = true or false, see how output differs
+
+find best “base” model based on AIC and lrtest
+
 

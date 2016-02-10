@@ -1,0 +1,155 @@
+---
+title: "Robin CE Sea Otter"
+author: "Sarah Klain"
+date: "January 8, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Robin's Sea Otter CE
+```{r}
+library(mlogit)
+setwd("C:\\Naidoo\\M\\UBC_Canada\\BCCES\\final survey data")
+test<-read.csv("CE.otters.csv")
+test$resp<-as.numeric(test$survey.id)  ## numeric version of survey respondent ID
+
+test<-test[complete.cases(test),]   ### removing lines with missing values in response
+
+###### loop below retains only individuals who filled in all responses
+
+testa<-test[0,]
+for (k in 1:length(unique(test$survey.id)))
+{
+t1<-subset(test,test$survey.id==unique(test$survey.id)[k])
+if (nrow(t1)==28) testa<-rbind(testa,t1) 
+}
+
+#### Loop below is to add a third row for each question (the "neither" option)
+test<-testa
+temp<-test[0,]
+
+for (t in 1:length(unique(test$resp)))
+{ 
+bla1<-subset(test,test$resp==unique(test$resp)[t])
+	for(r in 1:max(bla1$q))
+	{	
+	bla2<-subset(bla1,bla1$q==r)
+	bla3<-bla2[1,]
+	if(sum(bla2$choice)>0) bla3[1,4]<-0 else bla3[1,4]<-1 ## if chose alt 3
+	bla3[1,3]<-3  ### setting alternative to 3
+	bla3[1,c(6:ncol(bla3)-1)]<-0  ## setting rest of the variables to 0
+	temp<-rbind(temp,bla3)
+	}
+}	
+
+test2<-rbind(test,temp)
+All<-test2[order(test2$resp,test2$q,test2$alt),]
+
+All2<-All
+Allm<-mlogit.data(All2,shape="long",choice="choice",alt.var="alt", id.var="survey.id")
+### only thing this does is change "choice" answers to "TRUE/FALSE" instead of "1/0"
+
+### I.  CE-only models
+
+model1<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters | -1,data=Allm, shape="long", alt.var="alt", choice="choice", id.var="survey.id")
+
+summary(model1)
+
+## random parameters:
+model2<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters | -1, rpar=c(time='n',cost='n'),data=Allm, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id")
+summary(model2)	
+
+## random parameters with panel:
+model3<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters | -1, rpar=c(time='n',cost='n'),data=Allm, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+summary(model3)
+
+lrtest(model1,model2,model3)
+lrtest(model2,model3)
+
+#     *** best model is panel RPL model!!  Use model 3 for coefficients, etc
+
+#  II.  Models including demographics
+
+dems<-read.csv("demographic variables_30July2013.csv")
+#Allm$id.char<-as.character(Allm$survey.id)
+#dems$id.char<-as.character(dems$survey.id)
+All.merge<-merge(Allm,dems,by="survey.id")
+
+Dems.small<-All.merge[,c(1:18,31,42,48,50, 54,56)]
+
+## wildlife.view+ age+ income+ canada+ male  + fishing.imp  ## otter.view maybe        ## include?
+
+Dems.small.ok<-Dems.small[complete.cases(Dems.small),]
+
+model3a<- mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters | -1, rpar=c(time='n',cost='n'),data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+
+## All demographics, RPL
+model5<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:male +otters:canada+otters:wildlife.view+otters:age + otters:income + otters:fishing.imp | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+#### RPL with age, gender, income
+model6<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters+ otters:male +otters:canada+otters:age + otters:income | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+#### RPL with previously viewed wildlife, fishing importance
+model7<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters+ otters:fishing.imp+otters:wildlife.view
+ | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+#### RPL with income only
+model8<- mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters+ otters:income
+ | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+#### RPL with previously viewed wildlife
+model9<- mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters+ otters:wildlife.view
+ | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+## All demographics, but no gender 
+model10<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:wildlife.view+otters:age + otters:income + otters:fishing.imp +otters:canada | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+## All demographics, VI resident 
+model11<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:wildlife.view+otters:age + otters:income + otters:fishing.imp +otters:resident | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+## All demographics, VI resident, no fishing importance
+model12<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:wildlife.view+otters:age + otters:income + otters:fishing.imp +otters:resident | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+## All demographics, but no gender or fishing importance
+model13<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:wildlife.view+otters:age + otters:income +otters:canada | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+
+
+AIC(model3a)
+AIC(model5)
+AIC(model6)
+AIC(model7)
+AIC(model8)
+AIC(model9)
+AIC(model10)  ## * best model!
+AIC(model11)
+AIC(model12)
+AIC(model13)
+
+#### simulating impact of otter reduction
+
+current.probs<- fitted.values(model10,outcome=F,newdata=Dems.small.ok)
+
+# no otter dataset:
+
+No.otters<-Dems.small.ok
+No.otters$otters[No.otters$otters==1]<-0
+
+no.otter.probs<- fitted.values(model5,outcome=F,newdata=No.otters)
+
+
+## All demographics, but no gender 
+model11<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:wildlife.view+otters:age + otters:income + whales:fishing.imp +otters:canada | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+## All demographics, but no gender 
+model12<-mlogit(choice~time+cost+gkayak+skayak+gboat+resort+camp+house+whales+otters + otters:fishing.imp + whales:fishing.imp | -1, rpar=c(time='n',cost='n'), data= Dems.small.ok, shape="long", alt.var="alt", choice="choice", id.var="survey.id", id="survey.id", panel=T)
+
+
+```
+
