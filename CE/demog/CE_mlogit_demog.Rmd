@@ -195,22 +195,35 @@ test1 <- mlogit(choice ~ small.loss + small.gain + big.gain +
 ```{r}
 summary(ml.wfml.dem1)
 ```
-### Random Parameters Model
-
-```{r}
-
-```
 
 Building models with demographic variables added, one by one. 
 
 ```{r}
-ml.wfml.dem <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  mi4 + mi8 +
-                    mi10 + bill + income:bill | white, wfml_d2)
+ml.wfml.dem <- mlogit(choice ~ small.loss + small.gain + big.gain +
+                        municipal + private + cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:big.gain + female:big.gain +
+                        white:big.gain + univ_degr:big.gain + 
+                        income:big.gain + wages:big.gain + 
+                        self.emp:big.gain + pol_dem:big.gain + 
+                        pol_ind:big.gain + pol_rep:big.gain + 
+                        coast_rec:big.gain
+                      | 1, wfml_d2)
+
 
 summary(ml.wfml.dem)
 ```
-
+white
+female
+age
+univ_degr
+income
+wages
+self.emp
+pol_dem
+pol_ind
+pol_rep
+coast_rec
 
 
 
