@@ -27,7 +27,7 @@ library(stargazer)
 
 Follow along Viton's work
 Conditional Logistic Regression
-```{r}
+#```{r}
 #clogit <- read.csv("clogit.csv", na.strings= "-999")
 
 # read in the data
@@ -87,7 +87,7 @@ res6$omega
 ```
 
 Learn from the examples of Croissant (2011).
-```{r}
+#```{r}
 library("mlogit")
 data("Train", package = "mlogit")
 head(Train, 3)
@@ -172,7 +172,7 @@ coef(ml.wfml)[-1]/coef(ml.wfml)[10]
 
 Explore with all demographic variables
 
-```{r}
+#```{r}
 ml.wfml.dem1 <- mlogit(choice ~ small.loss + small.gain + big.gain
               + municipal + private + cooperative +  mi4 + mi8 + 
                 mi10 + bill + bill:income | -1, wfml_d2)
@@ -192,7 +192,7 @@ test1 <- mlogit(choice ~ small.loss + small.gain + big.gain +
                     tol=10)
 ```
 
-```{r}
+#```{r}
 summary(ml.wfml.dem1)
 ```
 
@@ -212,19 +212,154 @@ ml.wfml.dem <- mlogit(choice ~ small.loss + small.gain + big.gain +
 
 
 summary(ml.wfml.dem)
-```
-white
-female
-age
-univ_degr
-income
-wages
-self.emp
-pol_dem
-pol_ind
-pol_rep
-coast_rec
 
+stargazer(ml.wfml.dem)
+```
+
+
+```{r}
+ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC + wages:ASC + 
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC + 
+                        coast_rec:ASC
+                      | 1, wfml_d2)
+
+summary(ml.wfml.dem2)
+```
+
+
+#```{r}
+ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC + wages:ASC + 
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC + 
+                       coast_rec:ASC + mean_nep:ASC + 
+                      mean_inst:ASC + mean_mor:ASC + 
+                      att_w_US:ASC + oper:ASC + const_st:ASC +
+                     wf_rec:ASC + sup:ASC + opp:ASC + dis:ASC +
+                      skep:ASC + int:ASC + af:ASC + con:ASC + 
+                        cur:ASC + ap:ASC + enth:ASC + app:ASC + 
+                        abuse_nep:ASC + bal_r_nep:ASC + 
+                        crisis_r_nep:ASC + spaceship_nep:ASC + 
+                        bau_nep:ASC + extract_r_ins:ASC + 
+                        loss_r_ins:ASC + decade_r_mor:ASC + 
+                       comm_rel:ASC + wild_rel:ASC +
+                        clean_inst:ASC + tech:ASC + tech_r:ASC + 
+                        iden_rel:ASC + kin_rel:ASC + 
+                        right_r_mor:ASC + health_rel:ASC + 
+                        other_rel:ASC + kin_met:ASC + 
+                        resp_met:ASC + iden_met:ASC + 
+                        other_met:ASC
+                      | 1, wfml_d2)
+
+summary(ml.wfml.dem3)
+```
+
+```{r}
+ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC +
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC 
+                       + coast_rec:ASC + mean_nep:ASC + 
+                        oper:ASC + const_st:ASC +
+                        wf_rec:ASC+ app:ASC + 
+                        abuse_nep:ASC + bal_r_nep:ASC + 
+                        crisis_r_nep:ASC + spaceship_nep:ASC +
+                      # bau_nep:ASC +
+                     # extract_r_ins:ASC +
+                      # loss_r_ins:ASC + decade_r_mor:ASC 
+                      # comm_rel:ASC + wild_rel:ASC +
+                    # clean_inst:ASC + tech:ASC + tech_r:ASC + 
+                      iden_rel:ASC + kin_rel:ASC + 
+                        right_r_mor:ASC + health_rel:ASC + 
+                        other_rel:ASC + kin_met:ASC + 
+                        resp_met:ASC + iden_met:ASC + 
+                        other_met:ASC
+                      | 1, wfml_d2)
+
+summary(ml.wfml.dem4)
+```
+
+
+```{r}
+ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC +
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC 
+                       + coast_rec:ASC + mean_nep:ASC + 
+                        oper:ASC + const_st:ASC +
+                        wf_rec:ASC+ app:ASC
+                      | 1, wfml_d2)
+
+summary(ml.wfml.dem4)
+```
+mean_nep
+mean_rel
+mean_met
+mean_inst
+mean_mor
+att_w_US
+oper
+const_st
+wf_rec
+sup
+opp
+dis
+skep
+int
+af
+con
+cur
+ap
+enth
+app
+abuse_nep
+bal_r_nep
+crisis_r_nep
+spaceship_nep
+bau_nep
+extract_r_ins
+loss_r_ins
+decade_r_mor
+comm_rel
+wild_rel
+clean_inst
+tech
+tech_r
+iden_rel
+kin_rel
+right_r_mor
+health_rel
+other_rel
+kin_met
+resp_met
+iden_met
+other_met
 
 
 
@@ -234,7 +369,7 @@ coast_rec
 wf.mxlc <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
                     mi4 + mi8 + mi10 + bill,
-                  wfml2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
 
 summary(wf.mxlc)
 ```
@@ -243,13 +378,13 @@ Ai
 wf.mxlc2 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
                     mi4 + mi8 + mi10 + bill,
-                  wfml2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), R = 100)
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), R = 100)
 
 summary(wf.mxlc2)
 ```
 What does panel do?
 
-```{r}
+#```{r}
 #takes 10 min to run with no panel
 wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
@@ -258,9 +393,13 @@ wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain +
 ```
 
 summary(wf.mxlc.np)
+
 # not correlated
+```{r}
 wf.mxlu <- update(wf.mxlc, correlation = FALSE)
 summary(wf.mxlu)
+```
+
 ```
 
 Translate to dollar values
