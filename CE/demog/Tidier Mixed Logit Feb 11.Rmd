@@ -1,4 +1,14 @@
 ---
+title: "Tidier Multinomial Logit"
+author: "Sarah Klain"
+date: "February 11, 2016"
+output:
+  pdf_document: default
+  html_document:
+    keep_md: yes
+---
+
+---
 title: "CE_mlogit"
 author: "Sarah Klain"
 date: "November 20, 2015"
@@ -24,108 +34,7 @@ library(mlogit)
 library(stargazer)
 ```
 
-
-Follow along Viton's work
-Conditional Logistic Regression
-#```{r}
-#clogit <- read.csv("clogit.csv", na.strings= "-999")
-
-# read in the data
-library(foreign)
-clogit <- read.csv("clogit.csv", col.names=c("mode","ttme","invc","invt","gc","chair","hinc", "psize","indj","indi","aasc","tasc","basc","casc","hinca","psizea","z","nij","ni"),na.strings="-999")
- 
-# check the data
-summary(clogit)
-str(clogit)
-head(clogit)
-# save a version of the data in internal format
-save(clogit,file="clogit.rdata")
-# read in the mlogit package
-library(mlogit)
-# read in the data we saved
-load(file="clogit.rdata")
-# provide a choice indicator, with names
-clogit$mode.ids<-factor(rep(1:4,210),labels=c("air","train","bus","car"))
-
-# for convenience, create a special form of the dataset: note that we exploit the case sensititivty here: clogit is the original dataset, while CLOGIT (all-caps) is the version for use with the mlogit package.
-
-CLOGIT<-mlogit.data(clogit,shape="long",choice="mode",alt.var="mode.ids")
-
-# first model : standard logit. We save the results into a variable and then view them. The first command uses the un-fixed dataset, while the second uses the mlogit-specific dataset, and is clearly easier to type in. Both produce the same output.
-
-res1<-mlogit(mode~ttme+gc, data=clogit, shape="long",
-                alt.var="mode.ids")
-summary(res1)
-res2<-mlogit(mode~ttme+gc,data=CLOGIT)
-summary(res2)
-
-# model with income interacted with the mode-specific dummys
-res3<-mlogit(mode~ttme+gc | hinc, data=CLOGIT)
-summary(res3)
-
- # model with gc arying by mode
-res4<-mlogit(mode~ttme | hinc | gc, data=CLOGIT)
-summary(res4)
-
-# mixed logit model  in which the alt-specific vars have independent normal distributions. We use Halton numbers for efficiency in computation, and use R=500 in our simulationsnote that the syntax for specifying random alt-specific dummys has changed.
-# we set print.level to 1 to get some feedback
-
-res5<-mlogit(mode~ttme+gc,data=CLOGIT,reflevel="car",
-      rpar=c("air:(intercept)"="n","bus:(intercept)"="n",
-      "train:(intercept)"="n"),R=500,halton=NA,print.level=1)
-summary(res5)
-
-# print info on what was estimated for a random parameter
-rpar(res5,"air:(intercept)")
-
-# same model, but multinomial probit (not discussed in the text)
-res6<-mlogit(mode~ttme+gc,data=CLOGIT,reflevel="car",
-             R=500,halton=NA,probit=TRUE,print.level=1)
-summary(res6)
-# Omega-sub-i for each mode:
-res6$omega
-```
-
-Learn from the examples of Croissant (2011).
-#```{r}
-library("mlogit")
-data("Train", package = "mlogit")
-head(Train, 3)
-Tr <- mlogit.data(Train, shape = "wide", choice = "choice", varying = 4:11, sep = "", alt.levels = c(1, 2), id = "id")
-head(Tr, 3)
-head(index(Tr), 3)
-
-#change price and time to more meaningful units (euros, hours respectively)
-Tr$price <- Tr$price/100 * 2.20371
-Tr$time <- Tr$time/60
-
-#We then estimate the model: both alternatives being virtual train trips, it is relevant to use only generic coefficients and to remove the intercept:
-
-ml.Train <- mlogit(choice ~ price + time + change + comfort | -1, Tr)
-summary(ml.Train)
-
-#coefficients are not directly interpretable, but dividing them by the price coefficient, we get monetary values :
-coef(ml.Train)[-1]/coef(ml.Train)[1]
-
-#Mixed logit
-Tr <- mlogit.data(Train, shape = "wide", varying = 4:11, choice = "choice", sep = "", opposite = c("price", "time", "change", "comfort"), alt.levels = c("choice1", "choice2"), id = "id")
-
-Train.ml <- mlogit(choice ~ price + time + change + comfort, Tr)
-summary(Train.ml)
-
-Train.mxlc <- mlogit(choice ~ price + time + change + comfort, Tr, panel = TRUE, rpar = c(time = "cn", change = "n", comfort = "ln"), correlation = TRUE, R = 100, halton = NA)
-
-summary(Train.mxlc)
-
-Train.mxlu <- update(Train.mxlc, correlation = FALSE)
-
-
-```
-
-
-
 ### Conditional Logit
-Try with my data
 
 Format data with demographic information using Tidyr.
 To make a unique row for each observation including demographic data
@@ -134,6 +43,10 @@ I added column obs1-obs24 in excel.
 These are columns 69-92 in cer_2016_01_08_dem2.csv
 ```{r}
 ce_d <- read.csv("cer_2016_01_08_dem2.csv")
+ce_d_s <- summary(ce_d[11:20])
+knitr:: kable(ce_d_s, align = 'c', format = 'markdown', digits = 4)
+  
+  
 #str(ce_d)
 #head(ce_d)
 dem_long <- tidyr::gather(ce_d, "obs", "obs1_24", 69:92)
@@ -172,50 +85,7 @@ coef(ml.wfml)[-1]/coef(ml.wfml)[10]
 
 Explore with all demographic variables
 
-#```{r}
-ml.wfml.dem1 <- mlogit(choice ~ small.loss + small.gain + big.gain
-              + municipal + private + cooperative +  mi4 + mi8 + 
-                mi10 + bill + bill:income | -1, wfml_d2)
-
-summary(ml.wfml.dem1)
-
-test1 <- mlogit(choice ~ 1| small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  mi4 + mi8 +
-                    mi10 + bill, wfml_d2, shape ="long", chid.var="id",
-                    alt.var="alt", method = "bfgs", heterosc = TRUE,
-                    tol=10)
-
-test1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  mi4 + mi8 +
-                    mi10 + bill | 1, wfml_d2, shape ="long", chid.var="id",
-                    alt.var="ALT", method = "bfgs", heterosc = TRUE,
-                    tol=10)
-```
-
-#```{r}
-summary(ml.wfml.dem1)
-```
-
 Building models with demographic variables added, one by one. 
-
-```{r}
-ml.wfml.dem <- mlogit(choice ~ small.loss + small.gain + big.gain +
-                        municipal + private + cooperative +  
-                        mi4 + mi8 + mi10 + bill + 
-                        age:big.gain + female:big.gain +
-                        white:big.gain + univ_degr:big.gain + 
-                        income:big.gain + wages:big.gain + 
-                        self.emp:big.gain + pol_dem:big.gain + 
-                        pol_ind:big.gain + pol_rep:big.gain + 
-                        coast_rec:big.gain
-                      | 1, wfml_d2)
-
-
-summary(ml.wfml.dem)
-
-stargazer(ml.wfml.dem, type = "text")
-```
-
 
 ```{r}
 ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
@@ -232,6 +102,7 @@ ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
                       | 1, wfml_d2)
 
 summary(ml.wfml.dem2)
+
 stargazer(ml.wfml.dem2, type = "text")
 ```
 
@@ -319,50 +190,6 @@ ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
 
 summary(ml.wfml.dem4)
 ```
-mean_nep
-mean_rel
-mean_met
-mean_inst
-mean_mor
-att_w_US
-oper
-const_st
-wf_rec
-sup
-opp
-dis
-skep
-int
-af
-con
-cur
-ap
-enth
-app
-abuse_nep
-bal_r_nep
-crisis_r_nep
-spaceship_nep
-bau_nep
-extract_r_ins
-loss_r_ins
-decade_r_mor
-comm_rel
-wild_rel
-clean_inst
-tech
-tech_r
-iden_rel
-kin_rel
-right_r_mor
-health_rel
-other_rel
-kin_met
-resp_met
-iden_met
-other_met
-
-
 
 ### Mixed Logit
 
