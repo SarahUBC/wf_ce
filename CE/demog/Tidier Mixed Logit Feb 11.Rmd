@@ -46,7 +46,6 @@ ce_d <- read.csv("cer_2016_01_08_dem2.csv")
 ce_d_s <- summary(ce_d[11:20])
 knitr:: kable(ce_d_s, align = 'c', format = 'markdown', digits = 4)
   
-  
 #str(ce_d)
 #head(ce_d)
 dem_long <- tidyr::gather(ce_d, "obs", "obs1_24", 69:92)
@@ -60,6 +59,31 @@ dem_long <- tidyr::gather(ce_d, "obs", "obs1_24", 69:92)
 write.csv(dem_long, "dem_long.csv")
 ```
 I copied and pasted the demographic data from dem_long.csv into dswf_ml_dem2.csv
+
+Make table of variable means
+```{r}
+wfml_d <- read.csv("dswf_ml_dem2.csv")
+w_tbl <- tbl_df(wfml_d)
+  
+tbl2 <- dplyr::select(w_tbl, ASC: coast_rec)
+View(tbl2)
+
+tbl3 <- dplyr::summarise_each(tbl2, funs(mean))
+
+knitr:: kable(tbl3, align = 'c', format = 'markdown', digits = 4)
+
+```
+
+tmp <- do.call(data.frame, 
+           list(mean = apply(test, 2, mean),
+                sd = apply(test, 2, sd),
+                median = apply(test, 2, median),
+                min = apply(test, 2, min),
+                max = apply(test, 2, max),
+                n = apply(test, 2, length)))
+tmp
+```
+
 
 ### Multinomial logit model
 ```{r}
@@ -79,13 +103,22 @@ summary(ml.wfml)
 
 #these outputs are the same as when I used support.CEs package
 
+#from Croissant: coef(ml.Train)[-1]/coef(ml.Train)[1]
 #divide by bill coefficient to obtain WTP associated with each attribute and level
-coef(ml.wfml)[-1]/coef(ml.wfml)[10]
+
+#I am confused by negative number of WTP
+coef(ml.wfml)[-3]/coef(ml.wfml)[10]
+
+coef(ml.wfml)[-4]/coef(ml.wfml)[10]
+
+coef(ml.wfml)[1:10]/coef(ml.wfml)[10]
+
+#calc confidence intervals for WTP
+#return to this later
+
 ```
 
-Explore with all demographic variables
-
-Building models with demographic variables added, one by one. 
+Explore with demographic variables
 
 ```{r}
 ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
@@ -103,45 +136,17 @@ ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
 
 summary(ml.wfml.dem2)
 
-stargazer(ml.wfml.dem2, type = "text")
+#stargazer(ml.wfml.dem2, type = "text")
+knitr:: kable(ml.wfml.dem2, align = 'c', format = 'markdown', digits = 4)
+
+coef(ml.wfml.dem2)[1:21]/coef(ml.wfml.dem2)[12]
+
 ```
 
 
-#```{r}
-ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
-                        big.gain + 
-                        municipal + private +                  
-                        cooperative +  
-                        mi4 + mi8 + mi10 + bill + 
-                        age:ASC + female:ASC +
-                        white:ASC + univ_degr:ASC + 
-                        income:ASC + wages:ASC + 
-                        self.emp:ASC + pol_dem:ASC + 
-                        pol_ind:ASC + pol_rep:ASC + 
-                       coast_rec:ASC + mean_nep:ASC + 
-                      mean_inst:ASC + mean_mor:ASC + 
-                      att_w_US:ASC + oper:ASC + const_st:ASC +
-                     wf_rec:ASC + sup:ASC + opp:ASC + dis:ASC +
-                      skep:ASC + int:ASC + af:ASC + con:ASC + 
-                        cur:ASC + ap:ASC + enth:ASC + app:ASC + 
-                        abuse_nep:ASC + bal_r_nep:ASC + 
-                        crisis_r_nep:ASC + spaceship_nep:ASC + 
-                        bau_nep:ASC + extract_r_ins:ASC + 
-                        loss_r_ins:ASC + decade_r_mor:ASC + 
-                       comm_rel:ASC + wild_rel:ASC +
-                        clean_inst:ASC + tech:ASC + tech_r:ASC + 
-                        iden_rel:ASC + kin_rel:ASC + 
-                        right_r_mor:ASC + health_rel:ASC + 
-                        other_rel:ASC + kin_met:ASC + 
-                        resp_met:ASC + iden_met:ASC + 
-                        other_met:ASC
-                      | 1, wfml_d2)
-
-summary(ml.wfml.dem3)
-```
 
 ```{r}
-ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
+ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
                         municipal + private +                  
                         cooperative +  
@@ -168,12 +173,29 @@ ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
                         other_met:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem4)
+summary(ml.wfml.dem3)
 ```
 
 
 ```{r}
-ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
+ml.wfml.dem5 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC +
+                         pol_dem:ASC + pol_ind:ASC + pol_rep:ASC 
+                       + coast_rec:ASC + mean_nep:ASC + 
+                        oper:ASC + wf_rec:ASC+ other_met:ASC
+                      | 1, wfml_d2)
+
+summary(ml.wfml.dem5)
+```
+
+```{r}
+ml.wfml.dem6 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
                         municipal + private +                  
                         cooperative +  
@@ -185,10 +207,13 @@ ml.wfml.dem4 <- mlogit(choice ~ small.loss + small.gain +
                         pol_ind:ASC + pol_rep:ASC 
                        + coast_rec:ASC + mean_nep:ASC + 
                         oper:ASC + const_st:ASC +
-                        wf_rec:ASC+ app:ASC
+                        wf_rec:ASC+ app:ASC + crisis_r_nep:ASC + spaceship_nep:ASC +
+                        right_r_mor:ASC + health_rel:ASC + 
+                        other_rel:ASC + kin_met:ASC + iden_met:ASC + 
+                        other_met:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem4)
+summary(ml.wfml.dem6)
 ```
 
 ### Mixed Logit
@@ -212,17 +237,17 @@ summary(wf.mxlc2)
 ```
 What does panel do?
 
-#```{r}
-#takes 10 min to run with no panel
+### ```{r}
+### takes 10 min to run with no panel
 wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
                     mi4 + mi8 + mi10 + bill,
                   wfml2, panel = FALSE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
-```
+### ```
 
 summary(wf.mxlc.np)
 
-# not correlated
+### not correlated
 ```{r}
 wf.mxlu <- update(wf.mxlc, correlation = FALSE)
 summary(wf.mxlu)
@@ -245,6 +270,24 @@ mean(big.gain.value.nc)
 ```
 
 Use AIC to compare models
+```{r}
+AIC(ml.wfml)
+AIC(ml.wfml.dem2)
+AIC(ml.wfml.dem3)
+AIC(ml.wfml.dem5)
+AIC(ml.wfml.dem6)
+AIC(wf.mxlu)
+AIC(wf.mxlc2)
+```
+
+Likelihood Ratio Test
+
+```{r}
+lrtest(ml.wfml, wf.mxlu)
+```
+
+
+
 
 Interact with demographics 
 e.g., age:mi4
@@ -255,7 +298,6 @@ AIC
 
 demographics
 test to see if panel = true or false, see how output differs
-
 find best “base” model based on AIC and lrtest
 
 
