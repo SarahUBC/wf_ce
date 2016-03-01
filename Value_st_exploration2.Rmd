@@ -1,0 +1,351 @@
+---
+title: "Value_statements"
+author: "Sarah Klain"
+date: "October 21, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Setup
+
+```{r}
+library(ggplot2) # for great charts
+library(ggthemes) # for pretty themes in ggplot
+library(viridis) # for pretty colors
+suppressMessages(library(dplyr))
+library(knitr) # tool for making nice tables
+library(tidyr) # data table wrangling tool
+library(broom)
+library(stargazer)
+```
+
+## Constructed Means
+
+Input data
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce") #set working directory
+#cm <- read.csv("Constr_means_MT.csv")
+cval <- read.csv("env_val/EnVal_subgroups_10_26_2015.csv")
+```
+
+str(cval)
+head(cval)
+I did exploratory plots of the data
+
+
+```{r}
+cval2 <- tidyr::gather(cval, "val_state", "response", 3:38) #short form to long form data for ease in analysis
+cval2$response_f <- as.factor(cval2$response)
+
+#cval2$val_state <- factor(cval2$val_state, levels=c("abuse_nep","bal_r_nep", "crisis_r_nep", "spaceship_nep", "bau_nep", "extract_r_ins", "clean_inst", "loss_r_ins", "comm_rel", "iden_rel", "kin_rel","resp_rel","wild_rel", "health_rel2", "other_rel", "tech_r",  "decade_r_mor","right_r_mor",  "kin_met", "resp_met", "iden_met", "other_met", "mean_nep", "mean_rel", "mean_met", "mean_inst", "mean_mor"))
+```
+str(cval2)
+head(cval2)
+View(cval2)
+
+
+```{r} 
+#bring into dplyr for ease in extracting one sub population
+ctbl <- cval2 %>%
+  tbl_df
+
+c_MT <- ctbl %>% 
+  filter(Sub_pop == "MT")
+```
+
+Bar chart, all value statements except means
+
+```{r}
+c_MT_vs <- c_MT %>% 
+  filter(val_state != "mean_nep" & val_state != "mean_rel" & val_state != "mean_inst" & val_state != "mean_mor" & val_state != "mean_met" & val_state != "health_r_rel" & val_state != "health_rel")
+
+no_means_bar <- ggplot(c_MT_vs, aes(x = response_f, fill = response_f)) +
+  geom_histogram(binwidth = 0.5) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("To what extent do you agree with these statements?") + 
+  facet_wrap(~val_state) +
+  coord_cartesian(xlim = c(0, 6)) 
+
+no_means_bar
+
+ggsave(no_means_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/no_means_bar.pdf")
+```
+
+NEP
+
+```{r}
+c_MT_vs_nep <- c_MT %>% 
+  filter(val_state == "abuse_nep" | val_state == "bal_r_nep" | val_state == "crisis_r_nep" | val_state == "bau_nep")
+  
+NEP_bar <- ggplot(c_MT_vs_nep, aes(x = response_f, fill = response_f)) +
+  geom_histogram(binwidth = 0.5) +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("NEP:\nTo what extent do you agree \nwith these statements?") + facet_wrap(~val_state)
+
+NEP_bar
+
+ggsave(NEP_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/NEP_bar.pdf")
+```
+
+Metaphors
+
+```{r}
+c_MT_vs_met <- c_MT %>% 
+  filter(val_state == "kin_met" | val_state == "resp_met" | val_state == "iden_met" | val_state == "other_met")
+
+met_bar <- ggplot(c_MT_vs_met, aes(x = response_f, fill = response_f)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1 = No, this is very unlike how I think about the ocean;\n5 = Yes, this is very much like how I think about the ocean") +
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
+  facet_wrap(~val_state)
+
+met_bar
+ggsave(met_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/met_bar.pdf")
+```
+
+Violin plots just for metaphors 
+
+```{r}
+dot_vio_met <- ggplot(c_MT_vs_met, aes(x = c_MT_vs_met$val_state, y = response, color =  c_MT_vs_met$val_state)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1), alpha = 0.2) +
+  geom_violin(alpha = 0.01) +
+  scale_color_viridis(discrete=TRUE, option = "plasma") +
+  xlab("Metaphor") + ylab("Mean Level of Agreement") +
+  ggtitle("Metaphor:\nI think about the ocean and\nthe plants and animals in it like...") +
+  theme_pander()
+
+dot_vio_met
+
+ggsave(dot_vio_met, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_met.pdf")
+```
+
+Relational
+
+```{r}
+c_MT_vs_rel <- c_MT %>% 
+  filter(val_state == "comm_rel" | val_state == "iden_rel" | val_state == "kin_rel" | val_state == "wild_rel" | val_state == "health_rel2" | val_state == "other_rel" )
+  
+rel_bar <- ggplot(c_MT_vs_rel, aes(x = response_f, fill = response_f)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree;\n 5=strongly agree") +
+  ggtitle("Relational:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
+
+rel_bar
+
+ggsave(rel_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/rel_bar.pdf")
+```
+
+Instrumental
+```{r}
+c_MT_vs_ins <- c_MT %>% 
+  filter(val_state == "extract_r_ins" | val_state == "clean_inst" | val_state == "loss_r_ins")
+
+ins_bar <- ggplot(c_MT_vs_ins, aes(x = response_f, fill = response_f)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ylab("Count") +
+  ggtitle("Instrumental Value:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
+
+ins_bar
+ggsave(ins_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/ins_bar.pdf")
+```
+
+Moral
+
+```{r}
+c_MT_vs_mor <- c_MT %>% 
+  filter(val_state == "decade_r_mor" | val_state == "right_r_mor")
+
+mor_bar <- ggplot(c_MT_vs_mor, aes(x = response_f, fill = response_f)) +
+  geom_histogram() +
+  scale_fill_viridis(discrete=TRUE, "Response") +
+  xlab("Response\n1=strongly disagree, not enviro; 5=strongly agree, enviro") +
+  ggtitle("Moral:\nTo what extent do you agree with these statements?") + facet_wrap(~val_state)
+
+mor_bar
+
+ggsave(mor_bar, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mor_bar.pdf")
+```
+dot plot 
+
+```{r}
+ all_val_st_dot <- ggplot(cval2, aes(x = val_state, y = response, color = Sub_pop)) +
+ geom_jitter(alpha = 0.01) +
+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("Value Statement") + ylab("Response\n1= strongly disagree; 5 = strongly agree") +
+  scale_fill_viridis(discrete=TRUE) +
+  scale_color_viridis(discrete=TRUE) +
+  ggtitle("To what extent do you agree with these statements?\n yellow = MT; blue = farmer") +
+  theme_pander() +
+  coord_cartesian(ylim = c(1, 5)) 
+
+all_val_st_dot
+
+ggsave(all_val_st_dot, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/all_val_st_dot.pdf")
+```
+
+Constructed scores (means by aggregated categories)
+ 
+```{r}
+c_MT_means <- c_MT <- ctbl %>% 
+  filter(val_state == "mean_nep" | val_state == "mean_rel" | val_state == "mean_inst" | val_state == "mean_mor" | val_state == "mean_met" )
+
+means_hist <- ggplot(c_MT_means, aes(x = response, fill = val_state)) +
+  geom_histogram(binwidth = 0.5) +
+  scale_fill_viridis(discrete=TRUE, "Category of\nValue Statement", option = "plasma") +
+  xlab("Response\n1=strongly disagree; 5=strongly agree") +
+  ggtitle("Constructed metrics: mean responses\nto statements grouped by theme") + facet_wrap(~val_state) +
+  coord_cartesian(xlim = c(1, 5)) 
+
+means_hist
+
+ggsave(means_hist, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/means_hist.pdf")
+```
+
+```{r}
+mean_val_st_box <- ggplot(c_MT_means, aes(x = val_state, y = response, fill = val_state)) +
+ geom_boxplot(binwidth = 0.5) +
+  xlab("Types of Constructed Mean") + ylab("Response\n1= stongly disagree; 5 = strongly agree") +
+  scale_fill_viridis(discrete=TRUE, "Category of Value\nStatement", option = "plasma") +
+  ggtitle("To what extent do you agree\nwith these value statements?") +
+  coord_cartesian(ylim = c(1, 5))
+
+mean_val_st_box
+
+ggsave(mean_val_st_box, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/mean_val_st_box.pdf") 
+```
+
+```{r}
+box_dot_means <- ggplot(c_MT_means, aes(x = val_state, y = response)) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 1/5) +
+  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 4) +
+  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 4) +
+  geom_boxplot(width=.2, outlier.shape = NA, alpha = 0.1) +
+  xlab("Type of Constructed Mean") + ylab("Response\n1= strongly disagree; 5 = strongly agree") +
+  ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample")  +
+  theme_pander()
+
+box_dot_means
+
+ggsave(box_dot_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/box_dot_means.pdf") 
+```
+
+And a squiggly violin plot! 
+
+```{r}
+dot_vio_means <- ggplot(c_MT_means, aes(x = val_state, y = response), fill = val_state) +
+  geom_jitter(position = position_jitter(width = 0.04, height = 0), color = "gold", alpha = 0.05) +
+  stat_summary(fun.y = min, colour = "turquoise4", geom = "point", size = 2) +
+  stat_summary(fun.y = max, colour = "red3", geom = "point", size = 2) +
+  geom_violin(alpha = 0.01) +
+  scale_fill_viridis(discrete=TRUE) +
+  xlab("Type of Constructed Mean") + ylab("Mean Level of Agreement") +
+  ggtitle("To what extent do you agree with these value statements?\nMechanical Turk Sample") +
+  theme_pander()
+
+dot_vio_means
+
+ggsave(dot_vio_means, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/dot_vio_means.pdf")
+```
+
+
+Linear Models
+
+Mean NEP and mean relational 
+
+
+```{r}
+ctbl <- cval %>%
+  tbl_df
+
+cMT <- cval %>% 
+  filter(Sub_pop == "MT")
+
+lm_nep_rel <- lm(cMT$mean_nep ~ cMT$mean_rel)
+summary(lm_nep_rel)
+lms <- summary(lm_nep_rel)
+coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+
+```
+
+```{r kable}
+
+out <-  lm(cMT$mean_nep ~ cMT$mean_rel)
+library(knitr)
+kable(summary(out)$coef, digits=3, format = "markdown")
+```
+
+```{r}
+neprel.table <- cbind(summary(out)$coef)
+knitr::kable(neprel.table, align = 'c', format = 'markdown', digits = 4)
+
+#cf <- coef(lm(cMT$mean_nep ~ cMT$mean_rel))
+```
+
+
+```{r}
+nep_rel_pt <- ggplot(cMT, aes(x = mean_nep, y = mean_rel)) +
+  geom_point(alpha = 0.5) +
+  scale_color_viridis(discrete=TRUE) +
+  geom_abline(intercept = 1.3950615, slope = 0.6926811, color = "orange") +
+  ggtitle("NEP vs Relational Scores for MT") +
+  theme_few() +
+  xlab("NEP") + ylab("Relational Constructed Metric")
+  
+nep_rel_pt 
+
+ggsave(nep_rel_pt, file="/Users/sarahklain/Documents/R_2015/wf_ce/figs/nep_rel_pt.pdf")
+```
+
+Instrumental and moral
+
+```{r}
+#cval$mean_mor_num <- as.numeric(cval$mean_mor)
+#cval$mean_inst_num <- as.numeric(cval$mean_inst)
+
+lm_inst_mor <- lm(cMT$mean_inst ~ cMT$mean_mor)
+summary(lm_inst_mor)
+coef(lm_inst_mor)
+
+ggplot(cMT, aes(x = mean_mor, y = mean_inst)) +
+  geom_point(alpha = 0.25, color = "#330033") +
+  geom_abline(intercept = 3.46003319, slope = -0.07460177, color = "#CC0000") +
+  xlab("Moral Constructed Metric") + ylab("Instrumental Constructed Metric") +
+  theme_few()
+```
+
+```{r}
+lm_inst_rel <- lm(cMT$mean_inst ~ cMT$mean_rel)
+summary(lm_inst_rel)
+coef(lm_inst_rel)
+```
+
+```{r}
+lm_nep_mor <- lm(cMT$mean_nep ~ cMT$mean_mor)
+summary(lm_nep_mor)
+coef(lm_inst_mor)
+```
+
+```{r}
+lm_met_rel <- lm(cMT$mean_met ~ cMT$mean_rel)
+summary(lm_met_rel)
+coef(lm_met_rel)
+library(stargazer)
+
+stargazer(lm_met_rel, type = "text", out = "lm_met_rel.txt")
+ggplot(cMT, aes(x = mean_met, y = mean_rel)) +
+  geom_point(alpha = 0.25, color = "#330033") +
+  geom_abline(intercept = 7.065353, slope = -1.262829, color = "#CC0000") +
+  xlab("Metaphor Constructed Metric") + ylab("Relational Constructed Metric") +
+  theme_few()
+```
