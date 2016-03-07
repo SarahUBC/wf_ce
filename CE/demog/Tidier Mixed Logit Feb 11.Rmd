@@ -74,20 +74,9 @@ tbl3 <- dplyr::summarise_each(tbl2, funs(mean))
 knitr:: kable(tbl3, align = 'c', format = 'markdown', digits = 4)
 
 ```
- Code from Ale
- 
-tmp <- do.call(data.frame, 
-           list(mean = apply(test, 2, mean),
-                sd = apply(test, 2, sd),
-                median = apply(test, 2, median),
-                min = apply(test, 2, min),
-                max = apply(test, 2, max),
-                n = apply(test, 2, length)))
-tmp
-```
-
 
 ### Multinomial logit model
+
 ```{r}
 wfml_d <- read.csv("dswf_ml_dem2.csv")
 
@@ -97,78 +86,60 @@ wfml_d2 <- mlogit.data(wfml_d, shape = "long", choice = "choice",
                      alt.var = "ALT", id = "id")
 head(wfml_d2, 3)
 
-ml.wfml <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+ml.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  mi4 + mi8 +
                     mi10 + bill  | -1, wfml_d2)
 
-summary(ml.wfml)
+summary(ml.bl.st.mi1)
+-1 * coef(ml.bl.st.mi1)[1:10]/coef(ml.bl.st.mi1)[10]
+AIC(ml.bl.st.mi1)
 
 #these outputs are the same as when I used support.CEs package
-
 #from Croissant: coef(ml.Train)[-1]/coef(ml.Train)[1]
 #divide by bill coefficient to obtain WTP associated with each attribute and level
-
-#I am confused by negative number of WTP
-coef(ml.wfml)[-3]/coef(ml.wfml)[10]
-
-coef(ml.wfml)[-4]/coef(ml.wfml)[10]
-
--1 * coef(ml.wfml)[1:10]/coef(ml.wfml)[10]
 
 #calc confidence intervals for WTP
 #return to this later
 
 ```
 
-Base: -30 biodiv, muni, -1
+Base: -30 biodiv, muni, mi1
 
 ```{r}
-wfml_dsl <- read.csv("dswf_ml_dem_sl.csv")
 
-wfml_dsl2 <- mlogit.data(wfml_dsl, shape = "long", choice = "choice",
-                     varying = 16:28, sep = "",
-                     alt.levels = c(1, 2, 3), 
-                     alt.var = "ALT", id = "id")
-head(wfml_d2, 3)
-
-ml.wfml.sl <- mlogit(choice ~ big.loss + small.gain + big.gain + 
-                    state + private + cooperative +  mi4 + mi8 +
+ml.bl.pri.m1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + state + cooperative +  mi4 + mi8 +
                     mi10 + bill  | -1, wfml_d2)
 
-summary(ml.wfml.sl)
+summary(ml.bl.pri.m1)
+-1 * coef(ml.bl.pri.m1)[1:10]/coef(ml.bl.pri.m1)[10]
+AIC(ml.bl.pri.m1)
 
-#these outputs are the same as when I used support.CEs package
 
--1 * coef(ml.wfml.sl)[1:10]/coef(ml.wfml.sl)[10]
+ml.sl.pri.m1 <- mlogit(choice ~ big.loss + small.gain + big.gain + 
+                    state + municipal + cooperative +  mi4 + mi8 +
+                    mi10 + bill  | -1, wfml_d2)
+
+summary(ml.sl.pri.m1)
+-1 * coef(ml.sl.pri.m1)[1:10]/coef(ml.sl.pri.m1)[10]
+AIC(ml.sl.pri.m1)
 ```
 
-Base: +30 biodiv, state, mi1
-
+Multinomial logit, baseline: small gain, state, 1 mi
 ```{r}
-wfml_dsg <- read.csv("dswf_ml_dem_sg.csv")
-
-wfml_dsg2 <- mlogit.data(wfml_dsg, shape = "long", choice = "choice",
-                     varying = 16:28, sep = "",
-                     alt.levels = c(1, 2, 3), 
-                     alt.var = "ALT", id = "id")
-
-ml.wfml.sg <- mlogit(choice ~ big.loss + small.loss + big.gain + 
+ml.sg.st.mi1 <- mlogit(choice ~ big.loss + small.loss + big.gain + 
                     municipal + private + cooperative +  mi4 + mi8 +
                     mi10 + bill  | -1, wfml_d2)
 
-summary(ml.wfml.sg)
-
-#these outputs are the same as when I used support.CEs package
-
--1 * coef(ml.wfml.sg)[1:10]/coef(ml.wfml.sg)[10]
+summary(ml.sg.st.mi1)
+AIC(ml.sg.st.mi1)
+-1 * coef(ml.sg.st.mi1)[1:10]/coef(ml.sg.st.mi1)[10]
 ```
-
-
 
 Explore with demographic variables
 
 ```{r}
-ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
+ml.bl.st.mi1.dem <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
                         municipal + private +                  
                         cooperative +  
@@ -181,21 +152,38 @@ ml.wfml.dem2 <- mlogit(choice ~ small.loss + small.gain +
                         coast_rec:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem2)
+summary(ml.bl.st.mi1.dem)
 
 #stargazer(ml.wfml.dem2, type = "text")
 knitr:: kable(ml.wfml.dem2, align = 'c', format = 'markdown', digits = 4)
 
-coef(ml.wfml.dem2)[1:21]/coef(ml.wfml.dem2)[12]
+coef(ml.bl.st.mi1.dem)[1:21]/coef(ml.bl.st.mi1.dem)[12]
+AIC(ml.bl.st.mi1.dem)
 
+ml.bl.pr.mi1.dem <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + state +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC + wages:ASC + 
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC + 
+                        coast_rec:ASC
+                      | 1, wfml_d2)
+
+summary(ml.bl.pr.mi1.dem)
+
+coef(ml.bl.pr.mi1.dem)[1:21]/coef(ml.bl.pr.mi1.dem)[12]
+AIC(ml.bl.pr.mi1.dem)
 ```
 
 
-
 ```{r}
-ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
+ml.bl.pr.mi1.dem1 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
-                        municipal + private +                  
+                        municipal + state +                  
                         cooperative +  
                         mi4 + mi8 + mi10 + bill + 
                         age:ASC + female:ASC +
@@ -203,7 +191,7 @@ ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
                         income:ASC +
                         self.emp:ASC + pol_dem:ASC + 
                         pol_ind:ASC + pol_rep:ASC 
-                       + coast_rec:ASC + mean_nep:ASC + 
+                       + coast_rec:ASC +  
                         oper:ASC + const_st:ASC +
                         wf_rec:ASC+ 
                         abuse_nep:ASC + bal_r_nep:ASC + 
@@ -220,14 +208,16 @@ ml.wfml.dem3 <- mlogit(choice ~ small.loss + small.gain +
                         other_met:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem3)
+summary(ml.bl.pr.mi1.dem1)
+-1 * coef(ml.bl.pr.mi1.dem1)[1:21]/coef(ml.bl.pr.mi1.dem1)[12]
+AIC(ml.bl.pr.mi1.dem1)
 ```
 
 
 ```{r}
-ml.wfml.dem5 <- mlogit(choice ~ small.loss + small.gain +
+ml.bl.pr.mi1.dem2 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
-                        municipal + private +                  
+                        municipal + state +                  
                         cooperative +  
                         mi4 + mi8 + mi10 + bill + 
                         age:ASC + female:ASC +
@@ -238,13 +228,14 @@ ml.wfml.dem5 <- mlogit(choice ~ small.loss + small.gain +
                         oper:ASC + wf_rec:ASC+ other_met:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem5)
+summary(ml.wfml.dem2)
+AIC(ml.bl.pr.mi1.dem2)
 ```
 
 ```{r}
-ml.wfml.dem6 <- mlogit(choice ~ small.loss + small.gain +
+ml.bl.pr.mi1.dem3 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
-                        municipal + private +                  
+                        municipal + state +                  
                         cooperative +  
                         mi4 + mi8 + mi10 + bill + 
                         age:ASC + female:ASC +
@@ -254,34 +245,40 @@ ml.wfml.dem6 <- mlogit(choice ~ small.loss + small.gain +
                         pol_ind:ASC + pol_rep:ASC 
                        + coast_rec:ASC + mean_nep:ASC + 
                         oper:ASC + const_st:ASC +
-                        wf_rec:ASC+ app:ASC + crisis_r_nep:ASC + spaceship_nep:ASC +
+                        wf_rec:ASC+ crisis_r_nep:ASC + spaceship_nep:ASC +
                         right_r_mor:ASC + health_rel:ASC + 
                         other_rel:ASC + kin_met:ASC + iden_met:ASC + 
                         other_met:ASC
                       | 1, wfml_d2)
 
-summary(ml.wfml.dem6)
+summary(ml.bl.pr.mi1.dem3)
+AIC(ml.bl.pr.mi1.dem3)
 ```
 
 ### Mixed Logit
 
 ```{r}
-wf.mxlc <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+#mixed logits take ~5 min to run
+mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
                     mi4 + mi8 + mi10 + bill,
                   wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
 
-summary(wf.mxlc)
+summary(mx.bl.st.mi1)
+-1 * (coef(mx.bl.st.mi1)[3:12]/coef(mx.bl.st.mi1)[12])
+AIC(mx.bl.st.mi1)
 ```
-Ai
-```{r}
-wf.mxlc2 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  
-                    mi4 + mi8 + mi10 + bill,
-                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), R = 100)
 
-summary(wf.mxlc2)
+```{r}
+mx.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + state + cooperative +  
+                    mi4 + mi8 + mi10 + bill,
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+
+summary(mx.bl.pr)
+-1 * (coef(mx.bl.pr)[3:12]/coef(mx.bl.pr)[12])
 ```
+
 What does panel do?
 
 ### ```{r}
@@ -294,10 +291,11 @@ wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain +
 
 summary(wf.mxlc.np)
 
-### not correlated
+### Trying not correlated
 ```{r}
-wf.mxlu <- update(wf.mxlc, correlation = FALSE)
-summary(wf.mxlu)
+mx.bl.st.mi1.notcor <- update(mx.bl.st.mi1, correlation = FALSE)
+summary(mx.bl.st.mi1.notcor)
+AIC()
 ```
 
 ```
@@ -325,13 +323,13 @@ coef(wf.mxlc)[3:12]/coef(wf.mxlc)[12]
 
 Use AIC to compare models
 ```{r}
-AIC(ml.wfml)
-AIC(ml.wfml.dem2)
-AIC(ml.wfml.dem3)
-AIC(ml.wfml.dem5)
-AIC(ml.wfml.dem6)
-AIC(wf.mxlu)
-AIC(wf.mxlc2)
+AIC(ml.bl.pr.mi.dem1)
+AIC(ml.bl.pr.mi.dem2)
+AIC(ml.bl.pr.mi.dem3)
+AIC(ml.bl.pri.m1)
+AIC(ml.bl.st.m1)
+AIC(ml.bl.st.m1.dem)
+AIC(ml.sg.st.mi1)
 ```
 
 Likelihood Ratio Test
