@@ -113,12 +113,57 @@ coef(ml.wfml)[-3]/coef(ml.wfml)[10]
 
 coef(ml.wfml)[-4]/coef(ml.wfml)[10]
 
-coef(ml.wfml)[1:10]/coef(ml.wfml)[10]
+-1 * coef(ml.wfml)[1:10]/coef(ml.wfml)[10]
 
 #calc confidence intervals for WTP
 #return to this later
 
 ```
+
+Base: -30 biodiv, muni, -1
+
+```{r}
+wfml_dsl <- read.csv("dswf_ml_dem_sl.csv")
+
+wfml_dsl2 <- mlogit.data(wfml_dsl, shape = "long", choice = "choice",
+                     varying = 16:28, sep = "",
+                     alt.levels = c(1, 2, 3), 
+                     alt.var = "ALT", id = "id")
+head(wfml_d2, 3)
+
+ml.wfml.sl <- mlogit(choice ~ big.loss + small.gain + big.gain + 
+                    state + private + cooperative +  mi4 + mi8 +
+                    mi10 + bill  | -1, wfml_d2)
+
+summary(ml.wfml.sl)
+
+#these outputs are the same as when I used support.CEs package
+
+-1 * coef(ml.wfml.sl)[1:10]/coef(ml.wfml.sl)[10]
+```
+
+Base: +30 biodiv, state, mi1
+
+```{r}
+wfml_dsg <- read.csv("dswf_ml_dem_sg.csv")
+
+wfml_dsg2 <- mlogit.data(wfml_dsg, shape = "long", choice = "choice",
+                     varying = 16:28, sep = "",
+                     alt.levels = c(1, 2, 3), 
+                     alt.var = "ALT", id = "id")
+
+ml.wfml.sg <- mlogit(choice ~ big.loss + small.loss + big.gain + 
+                    municipal + private + cooperative +  mi4 + mi8 +
+                    mi10 + bill  | -1, wfml_d2)
+
+summary(ml.wfml.sg)
+
+#these outputs are the same as when I used support.CEs package
+
+-1 * coef(ml.wfml.sg)[1:10]/coef(ml.wfml.sg)[10]
+```
+
+
 
 Explore with demographic variables
 
@@ -269,6 +314,13 @@ big.gain.value.nc <- rpar(wf.mxlu, "big.gain", norm = "bill")
 summary(big.gain.value.nc)
 med(big.gain.value.nc)
 mean(big.gain.value.nc)
+
+mi4.value.nc <- rpar(wf.mxlc, "mi4", norm = "bill")
+summary(mi4.value.nc)
+med(mi4.value.nc)
+mean(mi4.value.nc)
+
+coef(wf.mxlc)[3:12]/coef(wf.mxlc)[12]
 ```
 
 Use AIC to compare models
