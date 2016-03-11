@@ -44,8 +44,8 @@ These are columns 69-92 in cer_2016_01_08_dem2.csv
 ```{r}
 ce_d <- read.csv("cer_2016_01_08_dem2.csv")
 ce_d_s <- summary(ce_d[11:20])
-str(ce_d)
-knitr:: kable(ce_d_s, align = 'c', format = 'markdown', digits = 4)
+# str(ce_d)
+# knitr:: kable(ce_d_s, align = 'c', format = 'markdown', digits = 4)
   
 #str(ce_d)
 #head(ce_d)
@@ -57,7 +57,7 @@ dem_long <- tidyr::gather(ce_d, "obs", "obs1_24", 69:92)
 
 #I deleted NAs in excel
 
-write.csv(dem_long, "dem_long.csv")
+# write.csv(dem_long, "dem_long.csv")
 ```
 I copied and pasted the demographic data from dem_long.csv into dswf_ml_dem2.csv
 
@@ -84,7 +84,7 @@ wfml_d2 <- mlogit.data(wfml_d, shape = "long", choice = "choice",
                      varying = 16:28, sep = "",
                      alt.levels = c(1, 2, 3), 
                      alt.var = "ALT", id = "id")
-head(wfml_d2, 3)
+# head(wfml_d2, 3)
 
 ml.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  mi4 + mi8 +
@@ -198,7 +198,7 @@ ml.bl.pr.mi1.dem3 <- mlogit(choice ~ small.loss + small.gain +
                      # extract_r_ins:ASC +
                       # loss_r_ins:ASC + decade_r_mor:ASC 
                       # comm_rel:ASC + wild_rel:ASC +
-                    # clean_inst:ASC + tech:ASC + tech_r:ASC + 
+                    # clean_inst:ASC + tech:ASC + 
                       iden_rel:ASC + kin_rel:ASC + 
                         right_r_mor:ASC + health_rel:ASC + 
                         other_rel:ASC + kin_met:ASC + 
@@ -221,7 +221,7 @@ ml.bl.pr.mi1.dem4 <- mlogit(choice ~ small.loss + small.gain +
                         age:ASC + female:ASC +
                         white:ASC + univ_degr:ASC + 
                         income:ASC +
-                         pol_dem:ASC + pol_ind:ASC + pol_rep:ASC 
+                        pol_dem:ASC + pol_ind:ASC + pol_rep:ASC 
                        + coast_rec:ASC + mean_nep:ASC + 
                         oper:ASC + wf_rec:ASC+ other_met:ASC
                       | 1, wfml_d2)
@@ -253,9 +253,27 @@ summary(ml.bl.pr.mi1.dem5)
 AIC(ml.bl.pr.mi1.dem5)
 ```
 
+```{r}
+ml.bl.pr.mi1.dem6 <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + state +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC + coast_rec:ASC 
+                        + oper:ASC + const_st:ASC +
+                        wf_rec:ASC
+                      | 1, wfml_d2)
+
+summary(ml.bl.pr.mi1.dem6)
+AIC(ml.bl.pr.mi1.dem6)
+```
+
+
 ### Mixed Logit
 
-```{r}
+# ```{r}
 #mixed logits take ~5 min to run
 mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
@@ -265,9 +283,9 @@ mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain +
 summary(mx.bl.st.mi1)
 -1 * (coef(mx.bl.st.mi1)[3:12]/coef(mx.bl.st.mi1)[12])
 AIC(mx.bl.st.mi1)
-```
+# ```
 
-```{r}
+#```{r}
 mx.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + state + cooperative +  
                     mi4 + mi8 + mi10 + bill,
@@ -278,11 +296,11 @@ summary(mx.bl.pr.mi1)
 AIC(mx.bl.pr.mi1)
 ```
 
-```{r}
-#mx.bl.pr.mi1.dem <- mlogit(choice ~ small.loss + small.gain + big.gain + 
- #                  municipal + state + cooperative +  
- #                  mi4 + mi8 + mi10 + bill,
- #                 wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+#```{r}
+mx.bl.pr.mi1.dem <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                  municipal + state + cooperative +  
+                  mi4 + mi8 + mi10 + bill,
+                 wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
 
 # summary(mx.bl.pr.mi1.dem)
 # -1 * (coef(mx.bl.pr.mi1.dem)[3:12]/coef(mx.bl.pr.mi1.dem)[12])
@@ -327,14 +345,15 @@ AIC(ml.bl.pr.mi1.dem2)
 AIC(ml.bl.pr.mi1.dem2)
 AIC(ml.bl.pr.mi1.dem3)
 AIC(ml.bl.pr.mi1.dem5)
-AIC(mx.bl.pr.mi1)
+AIC(ml.bl.pr.mi1.dem6)
+# AIC(mx.bl.pr.mi1)
 
 ```
 
 Likelihood Ratio Test
 
 ```{r}
-# lrtest(ml.wfml, wf.mxlu)
+# lrtest(ml.bl.pr.mi1.dem6, ml.bl.pr.mi1.dem2)
 ```
 
 Interact with demographics 
