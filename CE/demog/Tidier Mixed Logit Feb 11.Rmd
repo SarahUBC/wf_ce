@@ -99,7 +99,8 @@ AIC(ml.bl.st.mi1)
 #divide by bill coefficient to obtain WTP associated with each attribute and level
 
 #calc confidence intervals for WTP
-#return calc CI later
+# Exponeniate to make these confidence intervals for the odds ratio 
+exp(confint(ml.bl.st.mi1))
 
 ```
 
@@ -273,7 +274,7 @@ AIC(ml.bl.pr.mi1.dem6)
 
 ### Mixed Logit
 
-# ```{r}
+```{r}
 #mixed logits take ~5 min to run
 mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + private + cooperative +  
@@ -283,9 +284,9 @@ mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain +
 summary(mx.bl.st.mi1)
 -1 * (coef(mx.bl.st.mi1)[3:12]/coef(mx.bl.st.mi1)[12])
 AIC(mx.bl.st.mi1)
-# ```
+```
 
-#```{r}
+```{r}
 mx.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + state + cooperative +  
                     mi4 + mi8 + mi10 + bill,
@@ -294,35 +295,52 @@ mx.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain +
 summary(mx.bl.pr.mi1)
 -1 * (coef(mx.bl.pr.mi1)[3:12]/coef(mx.bl.pr.mi1)[12])
 AIC(mx.bl.pr.mi1)
+exp(confint(mx.bl.pr.mi1))
 ```
 
-#```{r}
-mx.bl.pr.mi1.dem <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                  municipal + state + cooperative +  
-                  mi4 + mi8 + mi10 + bill,
-                 wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
-
-# summary(mx.bl.pr.mi1.dem)
-# -1 * (coef(mx.bl.pr.mi1.dem)[3:12]/coef(mx.bl.pr.mi1.dem)[12])
-# AIC(mx.bl.pr.mi1.dem)
-```
-
-What does panel do?
-
-### ```{r}
-### takes 10 min to run with no panel
-wf.mxlc.np <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  
-                    mi4 + mi8 + mi10 + bill,
-                  wfml2, panel = FALSE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
-### ```
-
-# summary(wf.mxlc.np)
-
-### Trying not correlated
 ```{r}
-# mx.bl.st.mi1.notcor <- update(mx.bl.st.mi1, correlation = FALSE)
-# summary(mx.bl.st.mi1.notcor)
+mx.bl.pr.mi1.dem <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + state + cooperative +  
+                    mi4 + mi8 + mi10 + bill 
+                    + age:ASC + female:ASC + white:ASC + univ_degr:ASC + 
+                        income:ASC + coast_rec:ASC + oper:ASC + const_st:ASC +
+                        wf_rec:ASC,
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+
+summary(mx.bl.pr.mi1.dem)
+#-1 * ((mx.bl.pr.mi1.dem)[3:12]/coef(mx.bl.pr.mi1.dem)[12])
+AIC(mx.bl.pr.mi1.dem)
+```
+
+```{r}
+mx.bl.pr.mi1.dem2 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + state + cooperative +  
+                    mi4 + mi8 + mi10 + bill 
+                    + age:big.gain + female:big.gain + white:big.gain + univ_degr:big.gain
+                    + income:big.gain + coast_rec:big.gain + oper:big.gain + 
+                      const_st:big.gain + wf_rec:big.gain,
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+
+summary(mx.bl.pr.mi1.dem2)
+#-1 * coef((mx.bl.pr.mi1.dem2)[3:12]/coef(mx.bl.pr.mi1.dem2)[12])
+AIC(mx.bl.pr.mi1.dem2)
+
+```
+
+```{r}
+mx.bl.pr.mi1.dem3 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + state + cooperative +  
+                    mi4 + mi8 + mi10 + bill 
+                    + age:big.gain + female:big.gain + white:big.gain + univ_degr:big.gain
+                    + income:big.gain + coast_rec:big.gain,
+                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", state = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
+
+summary(mx.bl.pr.mi1.dem3)
+#-1 * (coef(mx.bl.pr.mi1.dem3)[3:12]/coef(mx.bl.pr.mi1.dem3)[12])
+
+AIC(mx.bl.pr.mi1.dem3)
+
+
 ```
 
 Translate to dollar values
@@ -346,8 +364,9 @@ AIC(ml.bl.pr.mi1.dem2)
 AIC(ml.bl.pr.mi1.dem3)
 AIC(ml.bl.pr.mi1.dem5)
 AIC(ml.bl.pr.mi1.dem6)
-# AIC(mx.bl.pr.mi1)
-
+AIC(mx.bl.st.mi1)
+AIC(mx.bl.pr.mi1)
+AIC(mx.bl.pr.mi1.dem)
 ```
 
 Likelihood Ratio Test
