@@ -385,3 +385,24 @@ AIC
 demographics
 test to see if panel = true or false, see how output differs
 find best “base” model based on AIC and lrtest
+
+
+```{r}
+setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE/mlogit/")
+wtp <- read.csv("model_r.csv")
+
+wtp$attribute <- factor(wtp$attribute, levels=c( "4 miles", "8 miles", "10 miles",  "municipal", "state", "coop","small loss", "small gain", "big gain"))
+
+bar_wtp <- ggplot(wtp, aes(x = attribute, y = WTP, fill = attribute)) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis(discrete=TRUE, option = "viridis") +
+  xlab("Offshore Wind Farm Attributes") +
+  ylab("WTP ($/month)") +
+  ggtitle("Willingness to pay for offshore wind farm attributes") +
+  theme(legend.position = "none")
+
+bar_wtp
+
+ggsave("wtp.pdf", width = 6, height = 4)
+```
+
