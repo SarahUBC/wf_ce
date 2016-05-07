@@ -1,4 +1,15 @@
 ---
+title: "Subset by demographic characteristics"
+author: "Sarah Klain"
+date: "May 6, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
 title: "Tidier Multinomial Logit"
 author: "Sarah Klain"
 date: "February 11, 2016"
@@ -8,14 +19,6 @@ output:
     keep_md: yes
 ---
 
----
-title: "CE_mlogit"
-author: "Sarah Klain"
-date: "November 20, 2015"
-output: 
-  html_document: 
-    keep_md: yes
----
 
 ```{r}
 setwd("/Users/sarahklain/Documents/R_2015/wf_ce/CE/demog")
@@ -44,9 +47,88 @@ These are columns 69-92 in cer_2016_01_08_dem2.csv
 ```{r}
 ce_d <- read.csv("cer_2016_01_08_dem2.csv")
 ce_d_s <- summary(ce_d[11:20])
-# str(ce_d)
+summary(ce_d)
 # knitr:: kable(ce_d_s, align = 'c', format = 'markdown', digits = 4)
-  
+```
+
+Subsample
+
+```{r}
+# Parameters
+target_mean = .51
+target_std = .5
+subsample_size= 300
+num_subsamples_to_keep = 5
+num_subsamples_to_try = 10000
+
+# This scoring metric is kind of arbitrary and could be tuned. 
+# For this one, I'm giving equal penalty to deviations from the target mean and the 
+# target standard deviation. If fitting the target mean was twice as important as 
+# fitting the target std, you could use:
+#    return(2*abs(mean-target_mean) + abs(std-target_std))
+# Lower scores are better than higher scores. If you redefined the scoring function 
+# to make high scores better, then you would need to do a reverse sort in the for loop below. 
+
+calculate_score <- function(mean, target_mean, std, target_std) { 
+    return(abs(mean-target_mean) + abs(std-target_std))
+}
+
+# Make up some data. This will have a different distribution than what we are looking for.
+df = ce_d
+#df = data.frame(x=rnorm(100), y=rnorm(100))
+
+# The matrix saved_subsamples will stores the best subsamples, but it will start off blank.
+# A corresponding dataframe below will store the scores (subsample_metrics). 
+# We'll keep saved_subsamples and subsample_metrics synchronized so that row 1 in one 
+# always corresponds to row 1 of the other. 
+saved_subsamples = matrix(nrow=num_subsamples_to_keep, ncol=subsample_size)
+
+# Store the metrics of a subsample's quality in this data frame. 
+# We'll keep the rows of this synchronized with saved_subsamples and
+# keep them both sorted so the worst saved subsample is always in the last row
+# When we find a new subsample that's better than the worst known, we'll save 
+# it and resort the matrix and dataframe.
+subsample_metrics = data.frame(mean=matrix(NaN, nrow=num_subsamples_to_keep), std=matrix(NaN, nrow=num_subsamples_to_keep), score=matrix(NaN, nrow=num_subsamples_to_keep))
+
+# Try a bunch of different subsamples and keep the best ones
+for (attempt in 1:num_subsamples_to_try) {
+    # Pick a new subsample and evaluate it. 
+    subsample = sample(nrow(df$female),size=subsample_size)
+  #subsample = sample(nrow(df),size=subsample_size)
+    subsample_mean = mean(df$female[subsample,'x'])
+    subsample_std = sd(df$female[subsample,'x'])
+    subsample_score = calculate_score(subsample_mean, target_mean, subsample_std, target_std)
+    # If we don't have any subsamples yet (worst score is NA), or if this new 
+    # subsample is better than our worst saved subsample, then overwrite our 
+    # worst subsample from the end and re-order the lists. 
+    if( is.na(subsample_metrics[nrow(subsample_metrics),'score']) ||
+            subsample_score < subsample_metrics[nrow(subsample_metrics),'score'] ) {
+        # Overwrite the worst saved subsample (row 1)
+        subsample_metrics[nrow(subsample_metrics),'mean'] = subsample_mean
+        subsample_metrics[nrow(subsample_metrics),'std'] = subsample_std
+        subsample_metrics[nrow(subsample_metrics),'score'] = subsample_score
+        # Transpose the subsample so it fits in one row instead of one column
+        saved_subsamples[nrow(saved_subsamples),] = t(subsample)
+        # Reorder the saved subsamples (and corresponding metrics) so the worst 
+        # scores (the largest) are at the bottom of the list.
+        new_order = order(subsample_metrics$score)
+        saved_subsamples = saved_subsamples[new_order,]
+        subsample_metrics = subsample_metrics[new_order,]
+    }
+}
+
+# Look at the top subsamples found & their scores
+print(subsample_metrics)
+print(saved_subsamples)
+
+# Retrieve the top-scoring subsample from the end of the list
+top_subsample_indexes = saved_subsamples[1,]
+# Use that to subsample the original dataset
+top_subsample = df[top_subsample_indexes,]
+```
+
+```{r}
+
 #str(ce_d)
 #head(ce_d)
 dem_long <- tidyr::gather(ce_d, "obs", "obs1_24", 69:92)
@@ -65,10 +147,17 @@ Make table of variable means
 ```{r}
 wfml_d <- read.csv("dswf_ml_dem2.csv")
 w_tbl <- tbl_df(wfml_d)
+  
+# tbl2 <- dplyr::select(w_tbl, ASC: coast_rec)
+# View(tbl2)
+
+# tbl3 <- dplyr::summarise_each(tbl2, funs(mean))
+
+# knitr:: kable(tbl3, align = 'c', format = 'markdown', digits = 4)
 
 ```
 
-### Logit model
+### Multinomial logit model
 
 ```{r}
 wfml_d <- read.csv("dswf_ml_dem2.csv")
@@ -79,6 +168,13 @@ wfml_d2 <- mlogit.data(wfml_d, shape = "long", choice = "choice",
                      alt.var = "ALT", id = "id")
 # head(wfml_d2, 3)
 
+ml.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
+                    municipal + private + cooperative +  mi4 + mi8 +
+                    mi10 + bill  | -1, wfml_d2)
+
+summary(ml.bl.st.mi1)
+-1 * coef(ml.bl.st.mi1)[1:10]/coef(ml.bl.st.mi1)[10]
+AIC(ml.bl.st.mi1)
 
 #these outputs are the same as when I used support.CEs package
 #from Croissant: coef(ml.Train)[-1]/coef(ml.Train)[1]
@@ -90,21 +186,45 @@ exp(confint(ml.bl.st.mi1))
 
 ```
 
-Conditional Logit Models
+
+Explore with demographic variables
+
 ```{r}
-ml.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain +
+ml.bl.st.mi1.dem <- mlogit(choice ~ small.loss + small.gain +
+                        big.gain + 
+                        municipal + private +                  
+                        cooperative +  
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC + 
+                        income:ASC + wages:ASC + 
+                        self.emp:ASC + pol_dem:ASC + 
+                        pol_ind:ASC + pol_rep:ASC + 
+                        coast_rec:ASC
+                      | 1, wfml_d2)
+
+summary(ml.bl.st.mi1.dem)
+
+
+coef(ml.bl.st.mi1.dem)[1:21]/coef(ml.bl.st.mi1.dem)[12]
+AIC(ml.bl.st.mi1.dem)
+
+ml.bl.pr.mi1.dem2 <- mlogit(choice ~ small.loss + small.gain +
                         big.gain + 
                         municipal + state +                  
                         cooperative +  
-                        mi4 + mi8 + mi10 + bill
-                       | 1, wfml_d2)
+                        mi4 + mi8 + mi10 + bill + 
+                        age:ASC + female:ASC +
+                        white:ASC + univ_degr:ASC +
+                        coast_rec:ASC
+                      | 1, wfml_d2)
 
-summary(ml.bl.pr.mi1)
-AIC(ml.bl.pr.mi1)
+summary(ml.bl.pr.mi1.dem2)
+AIC(ml.bl.pr.mi1.dem2)
+
+coef(ml.bl.pr.mi1.dem2)[1:21]/coef(ml.bl.pr.mi1.dem2)[12]
 
 ```
-
-Explore with demographic variables
 
 
 ```{r}
@@ -218,17 +338,7 @@ AIC(ml.bl.pr.mi1.dem6)
 
 ```{r}
 #mixed logits take ~5 min to run
-mx.bl.st.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
-                    municipal + private + cooperative +  
-                    mi4 + mi8 + mi10 + bill,
-                  wfml_d2, panel = TRUE, rpar = c(small.loss = "n", small.gain = "n", big.gain = "n", municipal = "n", private = "n", cooperative = "n", mi4 = "n", mi8 = "n", mi10 = "n", bill = "n"), correlation = TRUE, R = 100, halton = NA)
 
-summary(mx.bl.st.mi1)
--1 * (coef(mx.bl.st.mi1)[3:12]/coef(mx.bl.st.mi1)[12])
-AIC(mx.bl.st.mi1)
-```
-
-```{r}
 mx.bl.pr.mi1 <- mlogit(choice ~ small.loss + small.gain + big.gain + 
                     municipal + state + cooperative +  
                     mi4 + mi8 + mi10 + bill,
